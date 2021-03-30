@@ -7,8 +7,10 @@ output: html_document
 
 * App Title and Names of your group members (1)
     + App Title: Potential health issue on the people who died with covid-19
-    +  Members: Trevor K Richardson, Sih-Yuan Han, Chi-Yun Liu 
-    
+    + Members: Trevor K Richardson, Sih-Yuan Han, Chi-Yun Liu
+    + Target User: People who are interested in the impact of covid with cross reference of chronic diseases based on map visualization
+    + Concept for the Shiny App: We expect that this app can show the information to users about how the confirmed cases and/or deaths toll of covid-19 change under the given condition. For example, the proportion of deaths from COVID-19 with some chronic diseases, and see what kind of chronic diseases has a higher death rate
+
 * Description of the problem to be analyzed in the Shiny App (1)
     + What kind of chronic disease has a higher risk of death when getting covid?
     + Does age affect the death rate when getting covid?
@@ -16,10 +18,10 @@ output: html_document
     + Compared to pandemic SARS(?)
     
 * Proposed data sources (1)
-    + Data from CDC
-    + https://data.cdc.gov/NCHS/Conditions-contributing-to-deaths-involving-corona/hk9y-quqm
-    + https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf
-    + https://data.cdc.gov/NCHS/AH-Provisional-COVID-19-Deaths-by-Race-and-Educati/i6ej-9eac
+    + Data from CDC  
+    https://data.cdc.gov/NCHS/Conditions-contributing-to-deaths-involving-corona/hk9y-quqm  
+    https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf  
+    https://data.cdc.gov/NCHS/AH-Provisional-COVID-19-Deaths-by-Race-and-Educati/i6ej-9eac
 
 * Overall Layout (1)
 
