@@ -1,5 +1,5 @@
 ---
-title: "ds_project_plan"
+title: "DS Project Plan by Trevor, Sihyuan and Chiyun"
 output:
   html_document: default
   pdf_document: default
