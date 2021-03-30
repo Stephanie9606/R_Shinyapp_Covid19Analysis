@@ -50,9 +50,9 @@ output:
     + Display qq plot, residual plot and summary of linear model
 
 * Allocation of Responsibilities for the team (1)
-    + Trevor K Richardson: 
-    + Sih-Yuan Han:
-    + Chi-Yun Liu: 
+    + Trevor K Richardson: tidy data, tab3
+    + Sih-Yuan Han: tidy data, tab2
+    + Chi-Yun Liu: tidy data, tab1
 
 * Project Steps/Schedule (1)
     + 4/5 
