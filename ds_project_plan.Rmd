@@ -28,6 +28,8 @@ output:
 * Overall Layout (1)
     + For the first tab, we may use a US map to be a basic visual of the dashboard to show any input that the user selects
     + For the second tab, we may use a table to show the analysis in details(table and/or plot)
+    + For the third tab, we may provide linear model
+    + For the last tab, we plan to add some info of our data and the purpose of making this app
 
 * Data Analysis and Visualization with User Choices and Results (2)
     + User interface
