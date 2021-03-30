@@ -1,0 +1,28 @@
+---
+title: "ds_project_plan"
+output: html_document
+---
+
+# Project Plan (10)---due 3/30
+
+* App Title and Names of your group members (1)
+    + App Title: Potential health issue on the people who died with covid-19
+    +  Members: Trevor K Richardson, Sih-Yuan Han, Chi-Yun Liu 
+    
+* Description of the problem to be analyzed in the Shiny App (1)
+    + What kind of chronic disease has a higher risk of death when getting covid?
+    + Does age affect the death rate when getting covid?
+    + Does each state’s lockdown policies work?
+    + Compared to pandemic SARS(?)
+    
+* Proposed data sources (1)
+
+* Overall Layout (1)
+
+* Data Analysis and Visualization with User Choices and Results (2)
+
+* Statistical Modeling with User Choices and Results (2)
+
+* Allocation of Responsibilities for the team (1)
+
+* Project Steps/Schedule (1)
