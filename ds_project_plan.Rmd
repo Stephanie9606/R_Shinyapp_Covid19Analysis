@@ -1,11 +1,12 @@
 ---
-title: "DS Project Plan by Trevor, Sihyuan and Chiyun"
+title: "Shiny App Project Plan"
+author: "Trevor, Sihyuan and Chiyun"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
-# Project Plan (10)---due 3/30
+# Project Plan (10)
 
 * App Title and Names of your group members (1)
     + App Title: Potential health issue on the people who died with covid-19
@@ -66,7 +67,7 @@ output:
       - server version 2
     
     + 4/26
-      - server version 3 / test 
+      - server version 3 / test overall app 
     
     + 5/3 
       - Submit HTML and .Rmd on GitHub and a note in Canvas
