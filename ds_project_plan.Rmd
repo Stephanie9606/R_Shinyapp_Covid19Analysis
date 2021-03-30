@@ -32,6 +32,9 @@ output: html_document
     3. Choice of before and after holidays’ periods
     4. Input of customized start and end date of interested cases data
     + Server
+    1. Output some plots
+    2. Output a map
+    3. Output some statistical summary
 
 * Statistical Modeling with User Choices and Results (2)
     + ANOVA test
@@ -45,3 +48,17 @@ output: html_document
     + Chi-Yun Liu: 
 
 * Project Steps/Schedule (1)
+    + 4/5 
+    - data clean and tidy
+    - ui ready
+    + 4/12
+    - server version 1
+    + 4/19
+    - server version 2
+    + 4/26
+    - server version 3 / test 
+    + 5/3 
+    - Submit HTML and .Rmd on GitHub and a note in Canvas
+    - Submit Complete Repo on GitHub and a note in Canvas
+    - Presentations
+    
