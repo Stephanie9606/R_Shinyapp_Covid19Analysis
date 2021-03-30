@@ -1,6 +1,8 @@
 ---
 title: "ds_project_plan"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 # Project Plan (10)---due 3/30
@@ -14,28 +16,30 @@ output: html_document
 * Description of the problem to be analyzed in the Shiny App (1)
     + What kind of chronic disease has a higher risk of death when getting covid?
     + Does age affect the death rate when getting covid?
+    + Does education affect the death rate when getting covid?
     + Does each state’s lockdown policies work?
-    + Compared to pandemic SARS(?)
     
 * Proposed data sources (1)
     + Data from CDC  
-    1. https://data.cdc.gov/NCHS/Conditions-contributing-to-deaths-involving-corona/hk9y-quqm  
-    2. https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf  
-    3. https://data.cdc.gov/NCHS/AH-Provisional-COVID-19-Deaths-by-Race-and-Educati/i6ej-9eac
+      1. https://data.cdc.gov/NCHS/Conditions-contributing-to-deaths-involving-corona/hk9y-quqm  
+      2. https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf  
+      3. https://data.cdc.gov/NCHS/AH-Provisional-COVID-19-Deaths-by-Race-and-Educati/i6ej-9eac
 
 * Overall Layout (1)
-    + For a first tab, we may use a US map to be a basic visual of the dashboard to show any input that the user selects.     + For a second tab, we may use a table to show the analysis in details(table and/or plot)
+    + For the first tab, we may use a US map to be a basic visual of the dashboard to show any input that the user selects
+    + For the second tab, we may use a table to show the analysis in details(table and/or plot)
 
 * Data Analysis and Visualization with User Choices and Results (2)
     + User interface
-    1. Choice of the interest of which chronic diseases’ data
-    2. Choice of before and after lockdown (different by states)
-    3. Choice of before and after holidays’ periods
-    4. Input of customized start and end date of interested cases data
+      1. Choice of the interest of which chronic diseases’ data
+      2. Choice of before and after lockdown (different by states)
+      3. Choice of before and after holidays’ periods
+      4. Input of customized start and end date of interested cases data
+    
     + Server
-    1. Output some plots
-    2. Output a map
-    3. Output some statistical summary
+      1. Output some plots
+      2. Output a map
+      3. Output some statistical summary
 
 * Statistical Modeling with User Choices and Results (2)
     + ANOVA test
@@ -50,16 +54,20 @@ output: html_document
 
 * Project Steps/Schedule (1)
     + 4/5 
-    - data clean and tidy
-    - ui ready
+      - data clean and tidy
+      - ui ready
+    
     + 4/12
-    - server version 1
+      - server version 1
+    
     + 4/19
-    - server version 2
+      - server version 2
+    
     + 4/26
-    - server version 3 / test 
+      - server version 3 / test 
+    
     + 5/3 
-    - Submit HTML and .Rmd on GitHub and a note in Canvas
-    - Submit Complete Repo on GitHub and a note in Canvas
-    - Presentations
+      - Submit HTML and .Rmd on GitHub and a note in Canvas
+      - Submit Complete Repo on GitHub and a note in Canvas
+      - Presentations
     
