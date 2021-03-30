@@ -24,6 +24,7 @@ output: html_document
     3. https://data.cdc.gov/NCHS/AH-Provisional-COVID-19-Deaths-by-Race-and-Educati/i6ej-9eac
 
 * Overall Layout (1)
+    + For a first tab, we may use a US map to be a basic visual of the dashboard to show any input that the user selects.     + For a second tab, we may use a table to show the analysis in details(table and/or plot)
 
 * Data Analysis and Visualization with User Choices and Results (2)
     + User interface
