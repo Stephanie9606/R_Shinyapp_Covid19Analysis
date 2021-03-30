@@ -28,7 +28,14 @@ output: html_document
 * Data Analysis and Visualization with User Choices and Results (2)
 
 * Statistical Modeling with User Choices and Results (2)
+    + ANOVA test
+    + Does chronic disease affect the death rate?
+    + Does a specific race have a higher death rate?
+    + Display qq plot, residual plot and summary of linear model
 
 * Allocation of Responsibilities for the team (1)
+    + Trevor K Richardson: 
+    + Sih-Yuan Han:
+    + Chi-Yun Liu: 
 
 * Project Steps/Schedule (1)
