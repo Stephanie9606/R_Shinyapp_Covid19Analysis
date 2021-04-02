@@ -25,15 +25,27 @@ url_input <- "https://data.cdc.gov/api/views/hk9y-quqm/rows.json?accessType=DOWN
 # convert and tidy interest data into a tibble
 json_data <- fromJSON(url_input, flatten = TRUE)
 glimpse(json_data)
-
 df_covid <- as_tibble(json_data$data) # as.tibble
+```
+
+```{r}
 df_covid %>% 
   select(-c(V1:V8)) %>% 
-  rename(data_as_of = `V9`, start_date = `V10`, end_data = `V11`, group = `V12`, year = `V13`, month = `V14`, state = `V15`, condition_group = `V16`, condition = `V17`, icd10_codes = `V18`, age_group = `V19`, covid_19_deaths = `V20`, number_of_mentions = `V21`, flag = `V22`) -> df_covid
+  rename(data_as_of = `V9`, start_date = `V10`, end_data = `V11`, group = `V12`, year = `V13`, month = `V14`, state = `V15`, condition_group = `V16`, condition = `V17`, icd10_codes = `V18`, age_group = `V19`, covid_19_deaths = `V20`, number_of_mentions = `V21`, flag = `V22`) %>% 
+  mutate(data_as_of = ymd_hms(data_as_of),
+         start_date = ymd_hms(start_date),
+         end_data = ymd_hms(end_data),
+         year = as.double(year),
+         month = as.double(month),
+         covid_19_deaths = as.double(covid_19_deaths),
+         number_of_mentions = as.double(number_of_mentions))-> df_covid
 df_covid
 ```
 
 
+```{r}
+unique(df_covid$condition_group)
+```
 
 
 
