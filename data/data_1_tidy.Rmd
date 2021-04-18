@@ -13,6 +13,7 @@ library(keyring)
 ```
 
 
+# Conditions contributing to deaths involving coronavirus disease 2019 (COVID-19), by age group and state, United States
 ```{r}
 # data input via API
 data_in <- GET(url = "https://data.cdc.gov/api/views/hk9y-quqm/rows.json?accessType=DOWNLOAD", apikey = key_get("datagov_API_KEY_SECURE"))
@@ -47,6 +48,7 @@ df_covid
 unique(df_covid$condition_group)
 ```
 
+# COVID-19 Case Surveillance Public Use Data with Geography
 
 
 
