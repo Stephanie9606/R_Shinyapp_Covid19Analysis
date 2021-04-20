@@ -1,20 +1,21 @@
 ---
-title: "DS Project Plan by Trevor, Sihyuan and Chiyun"
+title: "Shiny App Project Plan"
+author: "Trevor, Sihyuan and Chiyun"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
-# Project Plan (10)---due 3/30
+# Project Plan (10)
 
 * App Title and Names of your group members (1)
     + App Title: Potential health issue on the people who died with covid-19
     + Members: Trevor K Richardson, Sih-Yuan Han, Chi-Yun Liu
     + Target User: People who are interested in the impact of covid with cross reference of chronic diseases based on map visualization
-    + Concept for the Shiny App: We expect that this app can show the information to users about how the confirmed cases and/or deaths toll of covid-19 change under the given condition. For example, the proportion of deaths from COVID-19 with some chronic diseases, and see what kind of chronic diseases has a higher death rate
+    + Concept for the Shiny App: We expect that this app can show the information to users about how the confirmed cases and/or deaths toll of covid-19 change under the given condition. For example, since comorbidities are the cause of death for the majority of COVID-19 deaths, we want to see the proportion of deaths with a given comorbidity.
 
 * Description of the problem to be analyzed in the Shiny App (1)
-    + What kind of chronic disease has a higher risk of death when getting covid?
+    + Which comorbidity has a higher risk of death when getting covid?
     + Does age affect the death rate when getting covid?
     + Does education affect the death rate when getting covid?
     + Does each state’s lockdown policies work?
@@ -66,7 +67,7 @@ output:
       - server version 2
     
     + 4/26
-      - server version 3 / test 
+      - server version 3 / test overall app 
     
     + 5/3 
       - Submit HTML and .Rmd on GitHub and a note in Canvas
