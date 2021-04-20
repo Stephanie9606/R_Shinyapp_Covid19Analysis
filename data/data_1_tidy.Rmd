@@ -54,10 +54,3 @@ unique(df_covid$condition_group)
 
 
 
-
-
-
-
-
-
-
