@@ -1,0 +1,19 @@
+---
+title: "Data_Science_Project"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+covid_data <- read.csv("~/Desktop/STAT613/Data Science Project/covid_data.csv")
+# Remove all rows with NA values in the race column
+covid_data <- covid_data[!is.na(covid_data$race), ]
+# Remove all rows containing "Missing" values in the race column
+covid_data <- covid_data[-grep("Missing", covid_data$race), ]
+# Remove all rows containing "Unknown" values in the race column
+covid_data <- covid_data[-grep("Unknown", covid_data$race), ]
+```
+
