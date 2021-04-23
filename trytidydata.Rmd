@@ -1,0 +1,14 @@
+---
+title: "trytidydata"
+output: html_document
+---
+
+```{r}
+readr::read_rds("Data/tidy_covid19_case.rds") -> 
+  covid19
+```
+
+```{r}
+covid19
+```
+
