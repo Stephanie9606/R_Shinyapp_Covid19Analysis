@@ -27,8 +27,24 @@ ui <- fluidPage(
     tabPanel("USmap"
       
     ),
-    tabPanel("Data Analysis"
-      
+    tabPanel("Data Analysis",
+      sidebarLayout(
+        sidebarPanel(
+          varSelectInput("var1", "X Variable?", data = covid19_tidy),
+          varSelectInput("var2", "Y Variable?", data = covid19_tidy),
+          checkboxInput("cbox1", "color code by?")
+        ),
+        mainPanel(
+          tabsetPanel(type = "tabs",
+            tabPanel("ggplot",
+                     plotOutput("plot1")
+                     ),
+            tabPanel("lm summary",
+                     verbatimTextOutput("lms1")
+                     )
+            )
+        )
+      )
     ),
     tabPanel("Info"
       
