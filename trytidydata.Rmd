@@ -4,11 +4,18 @@ output: html_document
 ---
 
 ```{r}
-readr::read_rds("Data/tidy_covid19_case.rds") -> 
+library(readr)
+library(ggplot2)
+library(lubridate)
+readr::read_rds("DS_Final_App/data/tidy_covid19_case.rds") -> 
   covid19
 ```
 
 ```{r}
-covid19
+covid19 %>% 
+  na_if("Missing") %>% 
+  na_if("Unknown") %>% 
+  mutate(case_month = ym(case_month)) %>% 
+  mutate(sex = as.factor(sex))
 ```
 
