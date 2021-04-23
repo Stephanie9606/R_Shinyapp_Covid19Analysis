@@ -22,6 +22,7 @@ library(shiny)
 
 # UI
 ui <- fluidPage(
+  titlePanel("Covid-19 Data Analysis"),
   tabsetPanel(type = "pills",
     tabPanel("USmap"
       

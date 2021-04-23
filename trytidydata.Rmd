@@ -6,6 +6,7 @@ output: html_document
 ```{r}
 library(readr)
 library(ggplot2)
+library(tidyverse)
 library(lubridate)
 readr::read_rds("DS_Final_App/data/tidy_covid19_case.rds") -> 
   covid19
@@ -22,5 +23,13 @@ covid19 %>%
          death_yn = as.factor(death_yn),
          underlying_conditions_yn = as.factor(underlying_conditions_yn)) ->
   covid19_tidy
+```
+
+```{r}
+covid19_tidy %>% 
+  group_by(case_month, race) %>% 
+  summarise(total_case = n()) %>% 
+  ggplot(aes(x = case_month, y = total_case, color = race)) +
+  geom_smooth(se = F)
 ```
 
