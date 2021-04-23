@@ -4,7 +4,7 @@ library(readr)
 library(tidyverse)
 library(ggplot2)
 
-readr::read_rds("./Data/tidy_covid19_case.rds") -> 
+readr::read_rds("data/tidy_covid19_case.rds") -> 
   covid19_data
 
 library(shiny)
@@ -12,13 +12,13 @@ library(shiny)
 # UI
 ui <- fluidPage(
   tabsetPanel(type = "pills",
-    tabPanel("USmap",
+    tabPanel("USmap"
       
     ),
-    tabPanel("Data Analysis",
+    tabPanel("Data Analysis"
       
     ),
-    tabPanel("Info", 
+    tabPanel("Info"
       
     )
     
@@ -26,6 +26,9 @@ ui <- fluidPage(
 )
 
 # Server
+server <- function(input, output){
+  
+}
 
 # Application
 shinyApp(ui, server)
