@@ -10,7 +10,20 @@ readr::read_rds("./Data/tidy_covid19_case.rds") ->
 library(shiny)
 
 # UI
-ui <- fluidPage()
+ui <- fluidPage(
+  tabsetPanel(type = "pills",
+    tabPanel("USmap",
+      
+    ),
+    tabPanel("Data Analysis",
+      
+    ),
+    tabPanel("Info", 
+      
+    )
+    
+  )
+)
 
 # Server
 
