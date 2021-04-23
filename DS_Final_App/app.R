@@ -4,7 +4,7 @@ library(readr)
 library(tidyverse)
 library(ggplot2)
 
-readRDS("../Data/tidy_covid19_case.rds") -> 
+read_rds("tidy_covid19_case.rds") -> 
   covid19_data
 
 library(shiny)
