@@ -17,6 +17,14 @@ covid_data <- covid_data[-grep("Missing", covid_data$race), ]
 covid_data <- covid_data[-grep("Unknown", covid_data$race), ]
 
 covid_data %>% 
+  select(-case_positive_specimen_interval, -case_onset_interval) ->
+  covid_data
+
+covid_data %>% 
+  select(-exposure_yn) ->
+  covid_data
+
+covid_data %>% 
   saveRDS("Data/tidy_covid19_case.rds")
 ```
 
