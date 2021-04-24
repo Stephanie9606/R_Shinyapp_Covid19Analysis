@@ -38,10 +38,15 @@ covid19_tidy %>%
 
 ```{r}
 covid19_tidy %>% 
-  group_by_at()
+  count(res_state, name = "state_case_total") ->
+  state_case_total_df
+
+covid19_tidy %>% 
+  count(race, res_state, name = "case_by_race_state") %>% 
+  inner_join(state_case_total_df) %>% 
+  mutate(dist = round(case_by_race_state/state_case_total, digits = 5)) %>% 
+  filter(res_state == "CA")
 ```
-
-
 
 
 
