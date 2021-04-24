@@ -70,13 +70,34 @@ server <- function(input, output){
       summarise(n = n(), .groups = "keep")
   })
   
+  total_death <- reactive({
+    covid19_tidy %>% 
+      filter(death_yn == "Yes") %>% 
+      group_by(case_month, !!input$var1) %>% 
+      summarise(n = n(), .groups = "keep")
+  })
+  
   # plot1
   output$plot1 <- renderPlot({
     # modularity
-    p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
-      geom_smooth(se = F) +
-      labs(x = "Date", y = "Cumulative Cases") +
-      theme_bw()
+    # p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
+    #   geom_smooth(se = F) +
+    #   labs(x = "Date", y = "Cumulative Cases") +
+    #   theme_bw()
+    
+    # if-else
+    if(input$cboxg1 == "Case"){
+      p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
+        geom_smooth(se = F) +
+        labs(x = "Date", y = "Cumulative Cases") +
+        theme_bw()
+    } else if(input$cboxg1 == "Death"){
+      p1 <- ggplot(total_death(), aes(x = case_month, y = n, color = !!input$var1)) +
+        geom_smooth(se = F) +
+        labs(x = "Date", y = "Cumulative Deaths") +
+        theme_bw()
+    }
+    
     # output plot1
     p1
   })
