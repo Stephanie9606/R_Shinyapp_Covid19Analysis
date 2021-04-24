@@ -31,15 +31,14 @@ covid19 %>%
 ```{r}
 covid19_tidy %>% 
   group_by(case_month, race) %>% 
-  summarise(total_case = n()) %>% 
+  summarise(total_case = n(), .groups = "keep") %>% 
   ggplot(aes(x = case_month, y = total_case, color = race)) +
   geom_smooth(se = F)
 ```
 
 ```{r}
 covid19_tidy %>% 
-  ggplot(aes(x = case_month, y = race)) +
-  geom_
+  group_by_at()
 ```
 
 

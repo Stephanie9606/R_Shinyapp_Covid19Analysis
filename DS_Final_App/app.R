@@ -61,20 +61,46 @@ ui <- fluidPage(
 
 # Server
 server <- function(input, output){
-  # second tab
+  ## second tab
+  
+  # reactive
+  total_case <- reactive({
+    covid19_tidy %>% 
+      group_by(case_month, !!input$var3) %>% 
+      summarise(n = n(), .groups = "keep")
+  })
+  
+  # plot1
   output$plot1 <- renderPlot({
     # modularity
-    # reactive
-    total_case_df <- reactive({
-      covid19_tidy %>% 
-        group_by(case_month) %>% 
-        summarise(total_case = n())
-    })
-    p1 <- ggplot(data = total_case_df, aes(x = case_month, y = total_case, color = !!input$var3)) +
+    p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var3)) +
       geom_smooth(se = F)
-    
     # output plot1
     p1
+  })
+  
+  # plot2
+  output$plot2 <- renderPlot({
+    
+    # modularity
+    p2 <- ggplot(data = covid19_tidy, aes(x = !!input$var1, y = !!input$var2))
+    
+    # if-else numeric/factor
+    if(is.numeric(estate[[input$var2]]) && is.numeric(estate[[input$var3]])){
+      p2 <- p2 +
+        geom_point()
+    } else if (is.factor(estate[[input$var2]]) && is.factor(estate[[input$var3]])){
+      p2 <- p2 +
+        geom_jitter()
+    } else if (is.factor(estate[[input$var2]]) && is.numeric(estate[[input$var3]])){
+      p2 <- p2 +
+        geom_boxplot()
+    } else{
+      p2 <- p2 +
+        ggstance::geom_boxploth()
+    }
+    # output p2
+    p2
   })
 }
 
