@@ -36,3 +36,26 @@ covid19_tidy %>%
   geom_smooth(se = F)
 ```
 
+```{r}
+covid19_tidy %>% 
+  ggplot(aes(x = case_month, y = race)) +
+  geom_
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -35,12 +35,15 @@ ui <- fluidPage(
         sidebarPanel(
           varSelectInput("var1", "X Variable?", data = covid19_tidy),
           varSelectInput("var2", "Y Variable?", data = covid19_tidy),
-          checkboxInput("cbox1", "color code by?")
+          varSelectInput("var3", "color code by ?", data = covid19_tidy)
         ),
         mainPanel(
           tabsetPanel(type = "tabs",
-            tabPanel("ggplot",
+            tabPanel("check case by ?",
                      plotOutput("plot1")
+                      ),
+            tabPanel("ggplot",
+                     plotOutput("plot2")
                      ),
             tabPanel("lm summary",
                      verbatimTextOutput("lms1")
@@ -58,7 +61,21 @@ ui <- fluidPage(
 
 # Server
 server <- function(input, output){
-  
+  # second tab
+  output$plot1 <- renderPlot({
+    # modularity
+    # reactive
+    total_case_df <- reactive({
+      covid19_tidy %>% 
+        group_by(case_month) %>% 
+        summarise(total_case = n())
+    })
+    p1 <- ggplot(data = total_case_df, aes(x = case_month, y = total_case, color = !!input$var3)) +
+      geom_smooth(se = F)
+    
+    # output plot1
+    p1
+  })
 }
 
 # Application
