@@ -48,18 +48,22 @@ covid19_tidy %>%
   filter(res_state == "CA")
 ```
 
+```{r}
+covid19_tidy %>% 
+  group_by(case_month, race, res_state) %>% 
+  summarise(total_case = n(), .groups = "keep") %>% 
+  ggplot(aes(x = res_state, y = total_case, fill = race)) +
+  geom_col() +
+  coord_flip()
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
+```{r}
+covid19_tidy %>% 
+  group_by(case_month, race, age_group) %>% 
+  summarise(total_case = n(), .groups = "keep") %>% 
+  drop_na(age_group) %>% 
+  ggplot(aes(x = age_group, y = total_case, fill = race)) +
+  geom_col()
+```
 
 
