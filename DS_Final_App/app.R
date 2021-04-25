@@ -36,7 +36,7 @@ ui <- fluidPage(
     tabPanel("Data Analysis",
       sidebarLayout(
         sidebarPanel(
-          radioButtons("rbuts1", "Interesting in Case or Death data?", choices = case_types, selected = "Case"),
+          radioButtons("rbuts1", "What type of the data are you interested in?", choices = case_types, selected = "Case"),
           varSelectInput("var1", "Check the data based on?", data = covid19_tidy, selected = "res_state")
         ),
         mainPanel(
@@ -108,10 +108,6 @@ server <- function(input, output){
   # plot1
   output$plot1 <- renderPlot({
     # modularity
-    # p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
-    #   geom_smooth(se = F) +
-    #   labs(x = "Date", y = "Cumulative Cases") +
-    #   theme_bw()
     
     # if-else
     if(input$rbuts1 == "Case"){
@@ -145,7 +141,46 @@ server <- function(input, output){
     p1
   })
   
+  # plo2
+  output$plot2 <- renderPlot({
+    
+    # if-else
+    if(input$rbuts1 == "Case"){
+      d2 <- covid19_tidy
+    } else if(input$rbuts1 == "Death"){
+      d2 <- covid19_tidy %>% 
+        filter(death_yn == "Yes")
+    } else if(input$rbuts1 == "Hospitalization"){
+      d2 <- covid19_tidy %>% 
+        filter(hosp_yn == "Yes")
+    } else if(input$rbuts1 == "ICU"){
+      d2 <- covid19_tidy %>% 
+        filter(icu_yn == "Yes")
+    } else if(input$rbuts1 == "Underlying"){
+      d2 <- covid19_tidy %>% 
+        filter(underlying_conditions_yn == "Yes")
+    }
+    
+    # reactive for plot2
+    race_df <- reactive({
+      d2 %>% 
+        group_by(race, !!input$var1) %>% 
+        summarise(total_case = n(), .groups = "keep") %>% 
+        drop_na(!!input$var1)
+    })
+    
+    # modularity
+    p2 <- ggplot(race_df(), aes(x = !!input$var1, y = total_case, fill = race)) +
+      geom_col() +
+      coord_flip() +
+      theme_bw()
+    
+    # output plot2
+    p2  
+  })
 }
+
+
 
 # Application
 shinyApp(ui, server)
