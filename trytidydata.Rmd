@@ -66,4 +66,13 @@ covid19_tidy %>%
   geom_col()
 ```
 
+```{r}
+covid19_tidy %>% 
+  filter(death_yn == "Yes") %>% 
+  group_by(case_month, race, age_group) %>% 
+  summarise(total_case = n(), .groups = "keep") %>% 
+  drop_na(age_group) %>% 
+  ggplot(aes(x = age_group, y = total_case, fill = race)) +
+  geom_col()
+```
 

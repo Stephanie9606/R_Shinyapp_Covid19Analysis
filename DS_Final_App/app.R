@@ -23,6 +23,9 @@ covid19 %>%
 
 library(shiny)
 
+# rbuts1 choices
+case_types <- c("Case", "Death", "Hospitalization", "ICU", "Underlying")
+
 # UI
 ui <- fluidPage(
   titlePanel("Covid-19 Data Analysis"),
@@ -33,19 +36,18 @@ ui <- fluidPage(
     tabPanel("Data Analysis",
       sidebarLayout(
         sidebarPanel(
-          checkboxGroupInput("cboxg1", "Interesting in Case or Death data?", choices = c("Case", "Death")),
-          # varSelectInput("var", "Y Variable?", data = covid19_tidy),
-          varSelectInput("var1", "Check the data based on?", data = covid19_tidy)
+          radioButtons("rbuts1", "Interesting in Case or Death data?", choices = case_types, selected = "Case"),
+          varSelectInput("var1", "Check the data based on?", data = covid19_tidy, selected = "res_state")
         ),
         mainPanel(
           tabsetPanel(type = "tabs",
-            tabPanel("check case by ?",
+            tabPanel("Cumulative Data",
                      plotOutput("plot1")
                       ),
-            tabPanel("ggplot",
+            tabPanel("Race Analysis",
                      plotOutput("plot2")
                      ),
-            tabPanel("lm summary",
+            tabPanel("lm Summary",
                      verbatimTextOutput("lms1")
                      )
             )
@@ -63,18 +65,44 @@ ui <- fluidPage(
 server <- function(input, output){
   ## second tab
   
-  # reactive
+  # reactive for plot1
   total_case <- reactive({
     covid19_tidy %>% 
       group_by(case_month, !!input$var1) %>% 
-      summarise(n = n(), .groups = "keep")
+      summarise(n = n(), .groups = "keep") %>% 
+      drop_na(!!input$var1)
   })
   
   total_death <- reactive({
     covid19_tidy %>% 
       filter(death_yn == "Yes") %>% 
       group_by(case_month, !!input$var1) %>% 
-      summarise(n = n(), .groups = "keep")
+      summarise(n = n(), .groups = "keep") %>% 
+      drop_na(!!input$var1)
+  })
+  
+  total_hosp <- reactive({
+    covid19_tidy %>% 
+      filter(hosp_yn == "Yes") %>% 
+      group_by(case_month, !!input$var1) %>% 
+      summarise(n = n(), .groups = "keep") %>% 
+      drop_na(!!input$var1)
+  })
+  
+  total_icu <- reactive({
+    covid19_tidy %>% 
+      filter(icu_yn == "Yes") %>% 
+      group_by(case_month, !!input$var1) %>% 
+      summarise(n = n(), .groups = "keep") %>% 
+      drop_na(!!input$var1)
+  })
+  
+  total_uc <- reactive({
+    covid19_tidy %>% 
+      filter(underlying_conditions_yn == "Yes") %>% 
+      group_by(case_month, !!input$var1) %>% 
+      summarise(n = n(), .groups = "keep") %>% 
+      drop_na(!!input$var1)
   })
   
   # plot1
@@ -86,15 +114,30 @@ server <- function(input, output){
     #   theme_bw()
     
     # if-else
-    if(input$cboxg1 == "Case"){
+    if(input$rbuts1 == "Case"){
       p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
         geom_smooth(se = F) +
         labs(x = "Date", y = "Cumulative Cases") +
         theme_bw()
-    } else if(input$cboxg1 == "Death"){
+    } else if(input$rbuts1 == "Death"){
       p1 <- ggplot(total_death(), aes(x = case_month, y = n, color = !!input$var1)) +
         geom_smooth(se = F) +
         labs(x = "Date", y = "Cumulative Deaths") +
+        theme_bw()
+    } else if(input$rbuts1 == "Hospitalization"){
+      p1 <- ggplot(total_hosp(), aes(x = case_month, y = n, color = !!input$var1)) +
+        geom_smooth(se = F) +
+        labs(x = "Date", y = "Cumulative Hospitalization") +
+        theme_bw()
+    } else if(input$rbuts1 == "ICU"){
+      p1 <- ggplot(total_icu(), aes(x = case_month, y = n, color = !!input$var1)) +
+        geom_smooth(se = F) +
+        labs(x = "Date", y = "Cumulative ICU Condition") +
+        theme_bw()
+    } else if(input$rbuts1 == "Underlying"){
+      p1 <- ggplot(total_uc(), aes(x = case_month, y = n, color = !!input$var1)) +
+        geom_smooth(se = F) +
+        labs(x = "Date", y = "Cumulative Underlying Condition") +
         theme_bw()
     }
     
