@@ -1,0 +1,65 @@
+---
+title: "trytidydata"
+output: html_document
+---
+
+```{r}
+library(readr)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+readr::read_rds("DS_Final_App/data/tidy_covid19_case.rds") -> 
+  covid19
+```
+
+```{r}
+covid19 %>% 
+  na_if("Missing") %>% 
+  na_if("Unknown") %>% 
+  mutate(case_month = ym(case_month)) %>% 
+  mutate(age_group = str_replace(age_group, "to", "-"),
+         age_group = str_replace(age_group, "years", "")) %>% 
+  mutate(age_group = as.factor(age_group),
+         sex = as.factor(sex),
+         hosp_yn = as.factor(hosp_yn),
+         icu_yn = as.factor(icu_yn),
+         death_yn = as.factor(death_yn),
+         underlying_conditions_yn = as.factor(underlying_conditions_yn))  ->
+  covid19_tidy
+```
+
+```{r}
+covid19_tidy %>% 
+  group_by(case_month, race) %>% 
+  summarise(total_case = n(), .groups = "keep") %>% 
+  ggplot(aes(x = case_month, y = total_case, color = race)) +
+  geom_smooth(se = F)
+```
+
+```{r}
+covid19_tidy %>% 
+  count(res_state, name = "state_case_total") ->
+  state_case_total_df
+
+covid19_tidy %>% 
+  count(race, res_state, name = "case_by_race_state") %>% 
+  inner_join(state_case_total_df) %>% 
+  mutate(dist = round(case_by_race_state/state_case_total, digits = 5)) %>% 
+  filter(res_state == "CA")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

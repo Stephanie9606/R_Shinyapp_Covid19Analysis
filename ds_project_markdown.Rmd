@@ -26,5 +26,8 @@ covid_data %>%
 
 covid_data %>% 
   saveRDS("Data/tidy_covid19_case.rds")
+
+readRDS("Data/tidy_covid19_case.rds") ->
+  tryreadrds
 ```
 
