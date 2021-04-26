@@ -30,6 +30,13 @@ covid19 %>%
 
 ```{r}
 covid19_tidy %>% 
+  filter(between(case_month, as.Date("2021-01-01"), as.Date("2021-03-01"))) %>% 
+  arrange(case_month)
+```
+
+```{r}
+covid19_tidy %>% 
+  filter(between(case_month, as.Date("2020-05-01"), as.Date("2021-03-01"))) %>% 
   group_by(case_month, race) %>% 
   summarise(total_case = n(), .groups = "keep") %>% 
   ggplot(aes(x = case_month, y = total_case, color = race)) +

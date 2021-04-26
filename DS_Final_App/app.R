@@ -3,6 +3,7 @@
 library(readr)
 library(tidyverse)
 library(ggplot2)
+library(lubridate)
 
 readr::read_rds("data/tidy_covid19_case.rds") -> 
   covid19_data
@@ -37,7 +38,11 @@ ui <- fluidPage(
       sidebarLayout(
         sidebarPanel(
           radioButtons("rbuts1", "What type of the data are you interested in?", choices = case_types, selected = "Case"),
-          varSelectInput("var1", "Check the data based on?", data = covid19_tidy, selected = "res_state")
+          varSelectInput("var1", "Check the data based on?", data = covid19_tidy, selected = "res_state"),
+          sliderInput("slider1", "Select date range",
+                      min = as.Date("2020-10-01","%Y-%m-%d"),
+                      max = as.Date("2021-01-01","%Y-%m-%d"),
+                      value = c(as.Date("2020-01-01"), as.Date("2021-03-01")), timeFormat="%Y-%m")
         ),
         mainPanel(
           tabsetPanel(type = "tabs",
@@ -63,85 +68,53 @@ ui <- fluidPage(
 
 # Server
 server <- function(input, output){
-  ## second tab
+  ### second tab
   
-  # reactive for plot1
-  total_case <- reactive({
-    covid19_tidy %>% 
-      group_by(case_month, !!input$var1) %>% 
-      summarise(n = n(), .groups = "keep") %>% 
-      drop_na(!!input$var1)
-  })
-  
-  total_death <- reactive({
-    covid19_tidy %>% 
-      filter(death_yn == "Yes") %>% 
-      group_by(case_month, !!input$var1) %>% 
-      summarise(n = n(), .groups = "keep") %>% 
-      drop_na(!!input$var1)
-  })
-  
-  total_hosp <- reactive({
-    covid19_tidy %>% 
-      filter(hosp_yn == "Yes") %>% 
-      group_by(case_month, !!input$var1) %>% 
-      summarise(n = n(), .groups = "keep") %>% 
-      drop_na(!!input$var1)
-  })
-  
-  total_icu <- reactive({
-    covid19_tidy %>% 
-      filter(icu_yn == "Yes") %>% 
-      group_by(case_month, !!input$var1) %>% 
-      summarise(n = n(), .groups = "keep") %>% 
-      drop_na(!!input$var1)
-  })
-  
-  total_uc <- reactive({
-    covid19_tidy %>% 
-      filter(underlying_conditions_yn == "Yes") %>% 
-      group_by(case_month, !!input$var1) %>% 
-      summarise(n = n(), .groups = "keep") %>% 
-      drop_na(!!input$var1)
-  })
-  
-  # plot1
+  ## plot1
   output$plot1 <- renderPlot({
-    # modularity
-    
+
     # if-else
     if(input$rbuts1 == "Case"){
-      p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
-        geom_smooth(se = F) +
-        labs(x = "Date", y = "Cumulative Cases") +
-        theme_bw()
+      d1 <- covid19_tidy
     } else if(input$rbuts1 == "Death"){
-      p1 <- ggplot(total_death(), aes(x = case_month, y = n, color = !!input$var1)) +
-        geom_smooth(se = F) +
-        labs(x = "Date", y = "Cumulative Deaths") +
-        theme_bw()
+      d1 <- covid19_tidy %>% 
+        filter(death_yn == "Yes")
     } else if(input$rbuts1 == "Hospitalization"){
-      p1 <- ggplot(total_hosp(), aes(x = case_month, y = n, color = !!input$var1)) +
-        geom_smooth(se = F) +
-        labs(x = "Date", y = "Cumulative Hospitalization") +
-        theme_bw()
+      d1 <- covid19_tidy %>% 
+        filter(hosp_yn == "Yes")
     } else if(input$rbuts1 == "ICU"){
-      p1 <- ggplot(total_icu(), aes(x = case_month, y = n, color = !!input$var1)) +
-        geom_smooth(se = F) +
-        labs(x = "Date", y = "Cumulative ICU Condition") +
-        theme_bw()
+      d1 <- covid19_tidy %>% 
+        filter(icu_yn == "Yes")
     } else if(input$rbuts1 == "Underlying"){
-      p1 <- ggplot(total_uc(), aes(x = case_month, y = n, color = !!input$var1)) +
-        geom_smooth(se = F) +
-        labs(x = "Date", y = "Cumulative Underlying Condition") +
-        theme_bw()
+      d1 <- covid19_tidy %>% 
+        filter(underlying_conditions_yn == "Yes")
     }
+    
+    # filter date
+    filter_date <- reactive({
+     d1 %>%
+        filter(between(case_month, input$slider1[1], input$slider1[2]))
+    })
+    
+    # reactive for plot1
+    total_case <- reactive({
+      filter_date() %>% 
+        group_by(case_month, !!input$var1) %>% 
+        summarise(n = n(), .groups = "keep") %>% 
+        drop_na(!!input$var1)
+    })
+    
+    # modularity
+    p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
+      geom_smooth(se = F) +
+      labs(x = "Date") +
+      theme_bw()
     
     # output plot1
     p1
   })
   
-  # plo2
+  ## plo2
   output$plot2 <- renderPlot({
     
     # if-else
