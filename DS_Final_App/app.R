@@ -7,7 +7,7 @@ library(ggplot2)
 readr::read_rds("data/tidy_covid19_case.rds") -> 
   covid19_data
 
-covid19 %>% 
+covid19_data %>% 
   na_if("Missing") %>% 
   na_if("Unknown") %>% 
   mutate(case_month = ym(case_month)) %>% 
