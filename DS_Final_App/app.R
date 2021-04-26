@@ -8,7 +8,7 @@ library(leaflet)
 readr::read_rds("data/tidy_covid19_case.rds") -> 
   covid19_data
 
-covid19 %>% 
+covid19_data %>% 
   na_if("Missing") %>% 
   na_if("Unknown") %>% 
   mutate(case_month = ym(case_month)) %>% 
@@ -21,6 +21,7 @@ covid19 %>%
          death_yn = as.factor(death_yn),
          underlying_conditions_yn = as.factor(underlying_conditions_yn))  ->
   covid19_tidy
+
 
 library(shiny)
 
