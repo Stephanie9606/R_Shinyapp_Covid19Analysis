@@ -3,6 +3,7 @@
 library(readr)
 library(tidyverse)
 library(ggplot2)
+library(leaflet)
 
 readr::read_rds("data/tidy_covid19_case.rds") -> 
   covid19_data
@@ -21,6 +22,7 @@ covid19_data %>%
          underlying_conditions_yn = as.factor(underlying_conditions_yn))  ->
   covid19_tidy
 
+
 library(shiny)
 
 # rbuts1 choices
@@ -30,8 +32,16 @@ case_types <- c("Case", "Death", "Hospitalization", "ICU", "Underlying")
 ui <- fluidPage(
   titlePanel("Covid-19 Data Analysis"),
   tabsetPanel(type = "pills",
-    tabPanel("USmap"
+    tabPanel("Covid-19 USmap",
+             sidebarLayout(
+               sidebarPanel(
+                 varSelectInput("state", "State")
+               ),
+               mainPanel(
+                 leafletOutput("map")
+               )
       
+    )
     ),
     tabPanel("Data Analysis",
       sidebarLayout(
@@ -183,4 +193,5 @@ server <- function(input, output){
 
 
 # Application
+
 shinyApp(ui, server)

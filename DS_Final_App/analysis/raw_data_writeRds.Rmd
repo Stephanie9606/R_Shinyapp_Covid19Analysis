@@ -1,0 +1,38 @@
+---
+title: "Data_Science_Project"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# raw data downloaded from CDC
+# [link]: https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4
+covid_data <- read.csv("../DS_final_data/COVID-19_Case.csv")
+# Remove all rows with NA values in the race column
+covid_data <- covid_data[!is.na(covid_data$race), ]
+# Remove all rows containing "Missing" values in the race column
+covid_data <- covid_data[-grep("Missing", covid_data$race), ]
+# Remove all rows containing "Unknown" values in the race column
+covid_data <- covid_data[-grep("Unknown", covid_data$race), ]
+
+covid_data %>% 
+  select(-case_positive_specimen_interval, -case_onset_interval) ->
+  covid_data
+
+covid_data %>% 
+  select(-exposure_yn) ->
+  covid_data
+
+covid_data %>% 
+  saveRDS("Data/tidy_covid19_case.rds")
+
+readRDS("Data/tidy_covid19_case.rds") ->
+  tryreadrds
+
+# raw data is too big, push to github is not available 
+# we downloaded it to local and saved it as rds 
+```
+

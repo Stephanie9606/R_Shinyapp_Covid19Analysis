@@ -1,0 +1,66 @@
+---
+title: "data_tidy"
+author: "Liu Chi Yun"
+date: "4/25/2021"
+output: pdf_document
+---
+
+```{r message=FALSE}
+library(tidyverse)
+library(lubridate)
+```
+
+
+```{r}
+# read rds 
+readr::read_rds("../data/tidy_covid19_case.rds") -> 
+  covid19_data
+# clean data
+covid19_data %>% 
+  na_if("Missing") %>% 
+  na_if("Unknown") %>% 
+  mutate(case_month = ym(case_month)) %>% 
+  mutate(age_group = str_replace(age_group, "to", "-"),
+         age_group = str_replace(age_group, "years", "")) %>% 
+  mutate(age_group = as.factor(age_group),
+         sex = as.factor(sex),
+         hosp_yn = as.factor(hosp_yn),
+         icu_yn = as.factor(icu_yn),
+         death_yn = as.factor(death_yn),
+         underlying_conditions_yn = as.factor(underlying_conditions_yn))  ->
+  covid19_tidy
+```
+
+
+```{r}
+# tidy data
+# merge long/lat for shiny map
+# only focus on the US 51 states
+# long/ lat data from [link]:
+# https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations
+long_lat <- read_csv("../data/statelatlong.csv") 
+  
+long_lat %>% 
+  rename(state = City, abbr_state = State)-> long_lat
+
+covid19_tidy %>% 
+  select(-state_fips_code, -county_fips_code) %>% 
+  left_join(long_lat, by = c("res_state" = "abbr_state")) %>% 
+  filter(res_state != "GU", res_state !=  "VI", res_state != "PR") ->covid19_tidy
+
+# check if we already removed GU, VI, PR, which are outside the US territories
+# setdiff(unique(covid19_tidy$res_state), unique(log_lat$State))
+
+covid19_tidy %>% 
+  saveRDS("../data/covid19_tidy.rds")
+
+readRDS("../data/covid19_tidy.rds") ->
+  tryreadrds  
+```
+
+
+
+
+
+
+
