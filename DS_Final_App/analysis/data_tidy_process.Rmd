@@ -5,10 +5,13 @@ date: "4/25/2021"
 output: pdf_document
 ---
 
-```{r}
+```{r message=FALSE}
 library(tidyverse)
 library(lubridate)
 ```
+
+
+
 
 ```{r}
 readr::read_rds("../data/tidy_covid19_case.rds") -> 
@@ -28,9 +31,20 @@ covid19_data %>%
          underlying_conditions_yn = as.factor(underlying_conditions_yn))  ->
   covid19_tidy
 ```
+
+
 ```{r}
+# reference
+# https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations
+# read state long/lat, merge long, lat for map, remove fips code
+log_lat <- read_csv("../data/statelatlong.csv")
 covid19_tidy %>% 
-  group_by(res_state)
+  select(-state_fips_code, -county_fips_code) 
+
+# remove GU, VI, PR, 
+setdiff(unique(covid19_tidy$res_state), unique(log_lat$State))
+  
+  
 ```
 
 

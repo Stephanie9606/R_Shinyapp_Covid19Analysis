@@ -8,7 +8,7 @@ library(leaflet)
 readr::read_rds("data/tidy_covid19_case.rds") -> 
   covid19_data
 
-covid19_data %>% 
+covid19 %>% 
   na_if("Missing") %>% 
   na_if("Unknown") %>% 
   mutate(case_month = ym(case_month)) %>% 
@@ -29,7 +29,7 @@ library(shiny)
 ui <- fluidPage(
   titlePanel("Covid-19 Data Analysis"),
   tabsetPanel(type = "pills",
-    tabPanel("USmap",
+    tabPanel("Covid-19 USmap",
              sidebarLayout(
                sidebarPanel(
                  varSelectInput("state", "State")
@@ -74,44 +74,44 @@ server <- function(input, output){
   ## second tab
   
   # reactive
-  total_case <- reactive({
-    covid19_tidy %>% 
-      group_by(case_month, !!input$var1) %>% 
-      summarise(n = n(), .groups = "keep")
-  })
-  
-  total_death <- reactive({
-    covid19_tidy %>% 
-      filter(death_yn == "Yes") %>% 
-      group_by(case_month, !!input$var1) %>% 
-      summarise(n = n(), .groups = "keep")
-  })
-  
-  # plot1
-  output$plot1 <- renderPlot({
-    # modularity
-    # p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
-    #   geom_smooth(se = F) +
-    #   labs(x = "Date", y = "Cumulative Cases") +
-    #   theme_bw()
-    
-    # if-else
-    if(input$cboxg1 == "Case"){
-      p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
-        geom_smooth(se = F) +
-        labs(x = "Date", y = "Cumulative Cases") +
-        theme_bw()
-    } else if(input$cboxg1 == "Death"){
-      p1 <- ggplot(total_death(), aes(x = case_month, y = n, color = !!input$var1)) +
-        geom_smooth(se = F) +
-        labs(x = "Date", y = "Cumulative Deaths") +
-        theme_bw()
-    }
-    
-    # output plot1
-    p1
-  })
->>>>>>> main
+  # total_case <- reactive({
+  #   covid19_tidy %>% 
+  #     group_by(case_month, !!input$var1) %>% 
+  #     summarise(n = n(), .groups = "keep")
+  # })
+  # 
+  # total_death <- reactive({
+  #   covid19_tidy %>% 
+  #     filter(death_yn == "Yes") %>% 
+  #     group_by(case_month, !!input$var1) %>% 
+  #     summarise(n = n(), .groups = "keep")
+  # })
+  # 
+  # # plot1
+  # output$plot1 <- renderPlot({
+  #   # modularity
+  #   # p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
+  #   #   geom_smooth(se = F) +
+  #   #   labs(x = "Date", y = "Cumulative Cases") +
+  #   #   theme_bw()
+  #   
+  #   # if-else
+  #   if(input$cboxg1 == "Case"){
+  #     p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
+  #       geom_smooth(se = F) +
+  #       labs(x = "Date", y = "Cumulative Cases") +
+  #       theme_bw()
+  #   } else if(input$cboxg1 == "Death"){
+  #     p1 <- ggplot(total_death(), aes(x = case_month, y = n, color = !!input$var1)) +
+  #       geom_smooth(se = F) +
+  #       labs(x = "Date", y = "Cumulative Deaths") +
+  #       theme_bw()
+  #   }
+  #   
+  #   # output plot1
+  #   p1
+  # })
+
   
 }
 
