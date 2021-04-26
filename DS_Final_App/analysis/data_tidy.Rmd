@@ -1,5 +1,5 @@
 ---
-title: "data_by_state"
+title: "data_tidy"
 author: "Liu Chi Yun"
 date: "4/25/2021"
 output: pdf_document
@@ -11,12 +11,11 @@ library(lubridate)
 ```
 
 
-
-
 ```{r}
+# read rds 
 readr::read_rds("../data/tidy_covid19_case.rds") -> 
   covid19_data
-
+# clean data
 covid19_data %>% 
   na_if("Missing") %>% 
   na_if("Unknown") %>% 
@@ -34,17 +33,29 @@ covid19_data %>%
 
 
 ```{r}
-# reference
+# tidy data
+# merge long/lat for shiny map
+# only focus on the US 51 states
+# long/ lat data from [link]:
 # https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations
-# read state long/lat, merge long, lat for map, remove fips code
-log_lat <- read_csv("../data/statelatlong.csv")
-covid19_tidy %>% 
-  select(-state_fips_code, -county_fips_code) 
+long_lat <- read_csv("../data/statelatlong.csv") 
+  
+long_lat %>% 
+  rename(state = City, abbr_state = State)-> long_lat
 
-# remove GU, VI, PR, 
-setdiff(unique(covid19_tidy$res_state), unique(log_lat$State))
-  
-  
+covid19_tidy %>% 
+  select(-state_fips_code, -county_fips_code) %>% 
+  left_join(long_lat, by = c("res_state" = "abbr_state")) %>% 
+  filter(res_state != "GU", res_state !=  "VI", res_state != "PR") ->covid19_tidy
+
+# check if we already removed GU, VI, PR, which are outside the US territories
+# setdiff(unique(covid19_tidy$res_state), unique(log_lat$State))
+
+covid19_tidy %>% 
+  saveRDS("../data/covid19_tidy.rds")
+
+readRDS("../data/covid19_tidy.rds") ->
+  tryreadrds  
 ```
 
 
