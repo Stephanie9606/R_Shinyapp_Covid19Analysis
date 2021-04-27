@@ -10,6 +10,13 @@ library(lubridate)
 readr::read_rds("data/covid19_tidy.rds") -> 
   covid19_tidy
 
+# count death cases
+n_death <- covid19_tidy %>%
+  group_by(state) %>% 
+  count(death_yn) %>% 
+  pivot_wider(names_from = death_yn, values_from = n) %>% 
+  rename(death_cases = Yes, recovery_cases = No, status_unknown = `NA`)
+
 # convert latitude and longitude data in csv to a simple features object
 covid19_tidy %>% 
   st_as_sf(coords = c("Longitude", "Latitude"),
@@ -60,7 +67,7 @@ ui <- fluidPage(
         )
       )
     ),
-    tabPanel("Info",
+    tabPanel("Rank",
              dataTableOutput("rank")
     )
     
@@ -149,15 +156,19 @@ server <- function(input, output){
       coord_flip() +
       theme_bw()
     
-    # output plot2
+   # output plot2
     p2  
   })
-  tab 3 rank
+   # tab 3 rank
   output$rank <- renderDataTable({
     covid19_tidy %>%
       group_by(state) %>%
-      summarize(confirmed_cases = n(),
-                death_cases = )
+      summarize(confirmed_cases = n()) %>% 
+      left_join(n_death, by = "state") %>% 
+      mutate(`death_rate(%)` = round((death_cases / confirmed_cases)*100, digits = 2),
+             `recovery_rate(%)` = round((recovery_cases / confirmed_cases)*100, digits = 2)) %>% 
+      mutate(rank_confirmed = rank(confirmed_cases),
+             rank_death_rate = rank(`death_rate(%)`, ties.method = "first"))
   }, options = list(pageLength = 10))
 
 }
