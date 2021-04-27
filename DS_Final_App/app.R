@@ -4,24 +4,15 @@ library(readr)
 library(tidyverse)
 library(ggplot2)
 library(leaflet)
+library(sf)
 
-readr::read_rds("data/tidy_covid19_case.rds") -> 
-  covid19_data
-
-covid19_data %>% 
-  na_if("Missing") %>% 
-  na_if("Unknown") %>% 
-  mutate(case_month = ym(case_month)) %>% 
-  mutate(age_group = str_replace(age_group, "to", "-"),
-         age_group = str_replace(age_group, "years", "")) %>% 
-  mutate(age_group = as.factor(age_group),
-         sex = as.factor(sex),
-         hosp_yn = as.factor(hosp_yn),
-         icu_yn = as.factor(icu_yn),
-         death_yn = as.factor(death_yn),
-         underlying_conditions_yn = as.factor(underlying_conditions_yn))  ->
+readr::read_rds("data/covid19_tidy.rds") -> 
   covid19_tidy
 
+# convert latitude and longitude data in csv to a simple features object
+covid19_tidy %>% 
+  st_as_sf(coords = c("Longitude", "Latitude"),
+           crs = 4326, agr = "field")->cord_covid
 
 library(shiny)
 
@@ -35,7 +26,7 @@ ui <- fluidPage(
     tabPanel("Covid-19 USmap",
              sidebarLayout(
                sidebarPanel(
-                 varSelectInput("state", "State")
+                 varSelectInput("state", "State", data = covid19_tidy)
                ),
                mainPanel(
                  leafletOutput("map")
@@ -64,8 +55,8 @@ ui <- fluidPage(
         )
       )
     ),
-    tabPanel("Info"
-      
+    tabPanel("Info",
+             dataTableOutput("rank")
     )
     
   )
@@ -75,47 +66,6 @@ ui <- fluidPage(
 server <- function(input, output){
   ## second tab
   
-<<<<<<< HEAD
-  # reactive
-  # total_case <- reactive({
-  #   covid19_tidy %>% 
-  #     group_by(case_month, !!input$var1) %>% 
-  #     summarise(n = n(), .groups = "keep")
-  # })
-  # 
-  # total_death <- reactive({
-  #   covid19_tidy %>% 
-  #     filter(death_yn == "Yes") %>% 
-  #     group_by(case_month, !!input$var1) %>% 
-  #     summarise(n = n(), .groups = "keep")
-  # })
-  # 
-  # # plot1
-  # output$plot1 <- renderPlot({
-  #   # modularity
-  #   # p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
-  #   #   geom_smooth(se = F) +
-  #   #   labs(x = "Date", y = "Cumulative Cases") +
-  #   #   theme_bw()
-  #   
-  #   # if-else
-  #   if(input$cboxg1 == "Case"){
-  #     p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
-  #       geom_smooth(se = F) +
-  #       labs(x = "Date", y = "Cumulative Cases") +
-  #       theme_bw()
-  #   } else if(input$cboxg1 == "Death"){
-  #     p1 <- ggplot(total_death(), aes(x = case_month, y = n, color = !!input$var1)) +
-  #       geom_smooth(se = F) +
-  #       labs(x = "Date", y = "Cumulative Deaths") +
-  #       theme_bw()
-  #   }
-  #   
-  #   # output plot1
-  #   p1
-  # })
-
-=======
   # reactive for plot1
   total_case <- reactive({
     covid19_tidy %>% 
@@ -191,7 +141,6 @@ server <- function(input, output){
     # output plot1
     p1
   })
->>>>>>> main
   
   # plo2
   output$plot2 <- renderPlot({
@@ -230,13 +179,18 @@ server <- function(input, output){
     # output plot2
     p2  
   })
+  # tab 3 rank
+  output$rank <- renderDataTable({
+    covid19_tidy %>% 
+      group_by(state) %>% 
+      summarize(confirmed_cases = n(),
+                death_cases = )
+  }, options = list(pageLength = 10))
+  
 }
 
-<<<<<<< HEAD
-=======
 
 
 # Application
 
->>>>>>> main
 shinyApp(ui, server)
