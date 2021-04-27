@@ -152,14 +152,14 @@ server <- function(input, output){
     # output plot2
     p2  
   })
-  # tab 3 rank
+  tab 3 rank
   output$rank <- renderDataTable({
-    covid19_tidy %>% 
-      group_by(state) %>% 
+    covid19_tidy %>%
+      group_by(state) %>%
       summarize(confirmed_cases = n(),
                 death_cases = )
   }, options = list(pageLength = 10))
-  
+
 }
 
 
