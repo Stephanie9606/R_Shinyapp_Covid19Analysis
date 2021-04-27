@@ -13,7 +13,7 @@ library(lubridate)
 
 ```{r}
 # read rds 
-readr::read_rds("../data/tidy_covid19_case.rds") -> 
+readr::read_rds("../data/covid19_data.rds") -> 
   covid19_data
 # clean data
 covid19_data %>% 
@@ -44,7 +44,6 @@ long_lat %>%
   rename(state = City, abbr_state = State)-> long_lat
 
 covid19_tidy %>% 
-  select(-state_fips_code, -county_fips_code) %>% 
   left_join(long_lat, by = c("res_state" = "abbr_state")) %>% 
   filter(res_state != "GU", res_state !=  "VI", res_state != "PR") ->covid19_tidy
 
