@@ -26,13 +26,17 @@ covid19_tidy %>%
            crs = 4326, agr = "field") -> cord_covid
 
 library(shiny)
+library(bslib)
 
 # rbuts1 choices
 case_types <- c("Case", "Death", "Hospitalization", "ICU", "Underlying")
 
 # UI
 ui <- fluidPage(
+  # theme and title
+  theme = bs_theme(version = 4, bootswatch = "minty"),
   titlePanel("Covid-19 Data Analysis"),
+  # main pages
   tabsetPanel(type = "pills",
     tabPanel("Covid-19 USmap",
              sidebarLayout(
@@ -62,21 +66,37 @@ ui <- fluidPage(
                       ),
             tabPanel("Race Analysis",
                      plotOutput("plot2")
-                     ),
-            tabPanel("lm Summary",
-                     verbatimTextOutput("lms1")
                      )
             )
         )
       )
     ),
+    tabPanel("Data Analysis",
+      fluidRow(column(4,
+                      varSelectInput("var2", "X variable?", data = covid19_lmdf)
+                      ),
+               column(4,
+                      varSelectInput("var3", "Y variable?", data = covid19_lmdf)
+                      ),
+               column(4,
+                      checkboxInput("cbox1", "Check residual plot?"),
+                      checkboxInput("cbox2", "Check QQ plot?")
+                      )
+        
+      ),
+      fluidRow(
+        column(8, plotOutput("ggplotlm")),
+        column(4, verbatimTextOutput("slm"))
+      ),
+      fluidRow(
+        column(6, plotOutput("plotrsd")),
+        column(6, plotOutput("plotqq"))
+      )
+             
+    ),
     tabPanel("Rank",
              dataTableOutput("rank")
-    ),
-    tabPanel("Data Analysis"
-             
     )
-    
   )
 )
 
@@ -165,7 +185,63 @@ server <- function(input, output){
    # output plot2
     p2  
   })
-   # tab 3 rank
+  
+  ### third tab
+  # ggplot
+  output$ggplotlm <- renderPlot({
+    
+    # modularity
+    gglm <- ggplot(data = covid19_lmdf, aes(x = !!input$var2, y = !!input$var3))
+    
+    # if-else numeric/factor
+    if(is.numeric(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
+      gglm <- gglm +
+        geom_point()
+    } else if (is.factor(covid19_lmdf[[input$var2]]) && is.factor(covid19_lmdf[[input$var3]])){
+      gglm <- gglm +
+        geom_jitter()
+    } else if (is.factor(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
+      gglm <- gglm +
+        geom_boxplot()
+    } else{
+      gglm <- gglm +
+        ggstance::geom_boxploth()
+    }
+    
+    # output gglm
+    gglm  
+  })
+  
+  # lm summary
+  output$slm <- renderPrint({
+    lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]], data = covid19_lmdf)
+    print(summary(lmout), digits = 2)
+  })
+  
+  # optional: residual plot
+  output$plotrsd <- renderPlot({
+    if(isTRUE(input$cbox1)){
+      lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]])
+      qplot(x = lmout$fitted, y = lmout$residuals,
+            main = "Residuals vs Fitted",
+            xlab = "x",
+            ylab = "y")
+    }
+  })
+  
+  # optional: QQ plot 
+  output$plotqq <- renderPlot({
+    if(isTRUE(input$cbox2)){
+      lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]])
+      qplot(sample = lmout$residuals, geom = "qq",
+            main = "QQ Plot",
+            xlab = "theoretical",
+            ylab = "sample") +
+        geom_qq_line()
+    }
+  })
+  
+  ### forth tab
   output$rank <- renderDataTable({
     covid19_tidy %>%
       group_by(state) %>%
