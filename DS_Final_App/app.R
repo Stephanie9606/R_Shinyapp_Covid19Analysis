@@ -20,7 +20,7 @@ n_death <- covid19_tidy %>%
 # convert latitude and longitude data in csv to a simple features object
 covid19_tidy %>% 
   st_as_sf(coords = c("Longitude", "Latitude"),
-           crs = 4326, agr = "field")->cord_covid
+           crs = 4326, agr = "field") -> cord_covid
 
 library(shiny)
 
@@ -42,7 +42,7 @@ ui <- fluidPage(
       
     )
     ),
-    tabPanel("Data Analysis",
+    tabPanel("Plot Analysis",
       sidebarLayout(
         sidebarPanel(
           radioButtons("rbuts1", "What type of the data are you interested in?", choices = case_types, selected = "Case"),
@@ -69,6 +69,9 @@ ui <- fluidPage(
     ),
     tabPanel("Rank",
              dataTableOutput("rank")
+    ),
+    tabPanel("Data Analysis"
+             
     )
     
   )
