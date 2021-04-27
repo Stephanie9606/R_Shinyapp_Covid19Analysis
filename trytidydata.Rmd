@@ -87,3 +87,17 @@ covid19_tidy %>%
 unique(covid19_tidy[c("res_state")])
 ```
 
+```{r}
+covid19_tidy %>% 
+  filter(case_month == "2021-03-01")
+```
+
+```{r}
+covid19_tidy %>% 
+  select(-res_county) %>% 
+  filter(case_month != "2021-01-01") %>% 
+  filter(case_month != "2021-02-01") %>% 
+  filter(case_month != "2021-03-01") ->
+  covid19_tidy
+```
+

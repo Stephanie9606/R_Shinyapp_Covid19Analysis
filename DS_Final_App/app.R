@@ -36,8 +36,8 @@ ui <- fluidPage(
           varSelectInput("var1", "Check the data based on?", data = covid19_tidy, selected = "res_state"),
           sliderInput("slider1", "Select date range",
                       min = as.Date("2020-01-01","%Y-%m-%d"),
-                      max = as.Date("2021-03-01","%Y-%m-%d"),
-                      value = c(as.Date("2020-01-01"), as.Date("2021-03-01")), timeFormat="%Y-%m")
+                      max = as.Date("2020-12-01","%Y-%m-%d"),
+                      value = c(as.Date("2020-01-01"), as.Date("2020-12-01")), timeFormat="%m")
         ),
         mainPanel(
           tabsetPanel(type = "tabs",
