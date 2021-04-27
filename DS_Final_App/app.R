@@ -6,7 +6,7 @@ library(ggplot2)
 library(leaflet)
 library(lubridate)
 
-readr::read_rds("data/covid19_tidy.rds") -> 
+readr::read_rds("./data/covid19_tidy.rds") -> 
   covid19_tidy
 
 library(shiny)
