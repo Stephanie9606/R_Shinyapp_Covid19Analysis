@@ -72,12 +72,12 @@ covid19_tidy %>%
 
 ```{r}
 # for data analysis, lm and plot
-# 51 States Total Case
-covid19_tidy %>%
-  group_by(res_state) %>% 
+# cases
+covid19_tidy %>% 
+  group_by(res_state, symptom_status, sex, race, ethnicity, age_group) %>% 
   count() %>% 
-  rename("state_total_case" = "n") ->
-  covid19_bystate
+  rename("case" = "n") ->
+  covid_lm_case
 
 # new data
 covid19_tidy %>% 
@@ -86,8 +86,17 @@ covid19_tidy %>%
   pivot_wider(names_from = death_yn, values_from = n) %>% 
   rename("death" = "Yes",
          "recovery" = "No") %>% 
-  left_join(covid19_bystate) %>% 
-  select(-'NA') ->
+  select(-'NA') %>% 
+  left_join(covid_lm_case) ->
+  covid19_lmdf
+
+covid19_lmdf %>% 
+  glimpse()
+
+covid19_lmdf %>% 
+  mutate(symptom_status = as.factor(symptom_status),
+         race = as.factor(race),
+         ethnicity = as.factor(ethnicity)) ->
   covid19_lmdf
 
 covid19_lmdf %>% 

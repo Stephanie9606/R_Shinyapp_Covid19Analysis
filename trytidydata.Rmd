@@ -88,23 +88,8 @@ unique(covid19_tidy[c("current_status")])
 ```
 
 ```{r}
-# 51 States Total Case
-covid19_tidy %>%
-  group_by(res_state) %>% 
-  count() %>% 
-  rename("state_total_case" = "n") ->
-  covid19_bystate
-
-# new data
-covid19_tidy %>% 
-  group_by(res_state, symptom_status, sex, race, ethnicity, age_group, death_yn) %>% 
-  count() %>% 
-  pivot_wider(names_from = death_yn, values_from = n) %>% 
-  rename("death" = "Yes",
-         "recovery" = "No") %>% 
-  left_join(covid19_bystate) %>% 
-  select(-'NA') ->
-  covid19_lmdf
+covid19_lmdf %>% 
+  glimpse()
 
 # lm try
 lm(death~race, data = covid19_lmdf) -> lmout

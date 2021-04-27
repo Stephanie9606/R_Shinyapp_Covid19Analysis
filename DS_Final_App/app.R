@@ -10,6 +10,9 @@ library(lubridate)
 readr::read_rds("./data/covid19_tidy.rds") -> 
   covid19_tidy
 
+readr::read_rds("./data/covid19_lmdf.rds") -> 
+  covid19_lmdf
+
 # count death cases
 n_death <- covid19_tidy %>%
   group_by(state) %>% 
