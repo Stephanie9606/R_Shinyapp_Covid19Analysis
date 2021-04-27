@@ -37,7 +37,7 @@ ui <- fluidPage(
           sliderInput("slider1", "Select date range",
                       min = as.Date("2020-01-01","%Y-%m-%d"),
                       max = as.Date("2020-12-01","%Y-%m-%d"),
-                      value = c(as.Date("2020-01-01"), as.Date("2020-12-01")), timeFormat="%m")
+                      value = c(as.Date("2020-01-01"), as.Date("2020-12-01")), timeFormat="%Y-%m")
         ),
         mainPanel(
           tabsetPanel(type = "tabs",
