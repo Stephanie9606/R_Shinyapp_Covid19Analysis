@@ -6,12 +6,19 @@ library(ggplot2)
 library(leaflet)
 library(sf)
 library(lubridate)
+library("usmap")
 
 readr::read_rds("./data/covid19_tidy.rds") -> 
   covid19_tidy
 
 readr::read_rds("./data/covid19_lmdf.rds") -> 
   covid19_lmdf
+
+readr::read_rds("./data/covid19_by_state.rds") -> 
+  covid19_by_state
+
+readr::read_rds("./data/covid19_by_county.rds") -> 
+  covid19_by_county
 
 # count death cases
 covid19_tidy %>%
@@ -40,15 +47,15 @@ ui <- fluidPage(
   # main pages
   tabsetPanel(type = "pills",
     tabPanel("Covid-19 USmap",
-             sidebarLayout(
-               sidebarPanel(
-                 varSelectInput("state", "State", data = covid19_tidy)
-               ),
-               mainPanel(
-                 leafletOutput("map")
-               )
-      
-    )
+             tabPanel("Covid-19 USmap",
+                      selectInput(inputId = "mapinput",
+                                  label = "Choose Map Type",
+                                  choices = c("By State", "By County"),
+                                  mainPanel(
+                                    plotOutput("map")
+                                  )
+                      )
+             )
     ),
     tabPanel("Plot Analysis",
       sidebarLayout(
@@ -254,7 +261,24 @@ server <- function(input, output){
              Rank_Death_Rate = rank(`Death_Rate(%)`, ties.method = "first")) %>% 
       rename(State = state)
   }, options = list(pageLength = 10))
-
+  
+  output$map <- reactive({
+    if (input$mapinput == "By State"){
+      
+      p <- plot_usmap(data = covid19_by_state, values = "Cases", color = "white", labels = FALSE) + 
+        scale_fill_continuous(name = "Number of Cases", label = scales::comma) + 
+        theme(legend.position = "right")+
+        labs(title = "Cases of COVID-19 by State")
+      
+    } else {
+      
+      p <- plot_usmap(data = covid19_by_county, values = "Cases", labels = FALSE) + 
+        scale_fill_continuous(name = "Number of Cases", label = scales::comma) + 
+        theme(legend.position = "right")+
+        labs(title = "Cases of COVID-19 by County")
+    }
+    p
+})
 }
 
 
