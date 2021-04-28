@@ -14,11 +14,12 @@ readr::read_rds("./data/covid19_lmdf.rds") ->
   covid19_lmdf
 
 # count death cases
-n_death <- covid19_tidy %>%
+covid19_tidy %>%
   group_by(state) %>% 
   count(death_yn) %>% 
   pivot_wider(names_from = death_yn, values_from = n) %>% 
-  rename(death_cases = Yes, recovery_cases = No, status_unknown = `NA`)
+  rename(Death_Cases = Yes, Recovery_Cases = No, Status_Unknown = `NA`) ->
+  n_death
 
 # convert latitude and longitude data in csv to a simple features object
 covid19_tidy %>% 
@@ -245,12 +246,13 @@ server <- function(input, output){
   output$rank <- renderDataTable({
     covid19_tidy %>%
       group_by(state) %>%
-      summarize(confirmed_cases = n()) %>% 
+      summarize(Confirmed_Cases = n()) %>% 
       left_join(n_death, by = "state") %>% 
-      mutate(`death_rate(%)` = round((death_cases / confirmed_cases)*100, digits = 2),
-             `recovery_rate(%)` = round((recovery_cases / confirmed_cases)*100, digits = 2)) %>% 
-      mutate(rank_confirmed = rank(confirmed_cases),
-             rank_death_rate = rank(`death_rate(%)`, ties.method = "first"))
+      mutate(`Death_Rate(%)` = round((Death_Cases / Confirmed_Cases)*100, digits = 2),
+             `Recovery_Rate(%)` = round((Recovery_Cases / Confirmed_Cases)*100, digits = 2)) %>% 
+      mutate(Rank_Confirmed = rank(Confirmed_Cases),
+             Rank_Death_Rate = rank(`Death_Rate(%)`, ties.method = "first")) %>% 
+      rename(State = state)
   }, options = list(pageLength = 10))
 
 }
