@@ -191,8 +191,15 @@ server <- function(input, output){
   # ggplot
   output$ggplotlm <- renderPlot({
     
+    # reactive for ggplotlm
+    plot_lm <- reactive({
+      covid19_lmdf %>% 
+        drop_na(!!input$var2) %>% 
+        drop_na(!!input$var3)
+    })
+    
     # modularity
-    gglm <- ggplot(data = covid19_lmdf, aes(x = !!input$var2, y = !!input$var3))
+    gglm <- ggplot(data = plot_lm(), aes(x = !!input$var2, y = !!input$var3))
     
     # if-else numeric/factor
     if(is.numeric(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
@@ -203,7 +210,8 @@ server <- function(input, output){
         geom_jitter()
     } else if (is.factor(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
       gglm <- gglm +
-        geom_boxplot()
+        geom_boxplot() +
+        scale_y_log10()
     } else{
       gglm <- gglm +
         ggstance::geom_boxploth()
@@ -224,9 +232,7 @@ server <- function(input, output){
     if(isTRUE(input$cbox1)){
       lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]])
       qplot(x = lmout$fitted, y = lmout$residuals,
-            main = "Residuals vs Fitted",
-            xlab = "x",
-            ylab = "y")
+            main = "Residuals vs Fitted")
     }
   })
   
