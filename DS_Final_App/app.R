@@ -15,7 +15,7 @@ n_death <- covid19_tidy %>%
   group_by(state) %>% 
   count(death_yn) %>% 
   pivot_wider(names_from = death_yn, values_from = n) %>% 
-  rename(death_cases = Yes, recovery_cases = No, status_unknown = `NA`)
+  rename(Death_Cases = Yes, Recovery_Cases = No, Status_Unknown = `NA`)
 
 # convert latitude and longitude data in csv to a simple features object
 covid19_tidy %>% 
@@ -34,13 +34,17 @@ ui <- fluidPage(
     tabPanel("Covid-19 USmap",
              sidebarLayout(
                sidebarPanel(
-                 varSelectInput("state", "State", data = covid19_tidy)
+                 checkboxInput("confm1", "Confirmed Cases"),
+                 checkboxInput("death1", "Death Cases"),
+                 sliderInput("Usslider", "Select date range",
+                             min = as.Date("2020-01-01","%Y-%m-%d"),
+                             max = as.Date("2021-03-01","%Y-%m-%d"),
+                             value = c(as.Date("2020-01-01"), as.Date("2021-03-01")), timeFormat="%Y-%m")
                ),
                mainPanel(
                  leafletOutput("map")
                )
-      
-    )
+    ))
     ),
     tabPanel("Data Analysis",
       sidebarLayout(
@@ -67,17 +71,21 @@ ui <- fluidPage(
         )
       )
     ),
-    tabPanel("Rank",
+    tabPanel("Ranking",
              dataTableOutput("rank")
     )
-    
-  )
 )
 
 # Server
 server <- function(input, output){
-  ### second tab
+  ### tab 1 Us map
+  output$map <- renderLeaflet({
+    leaflet() %>% 
+      addTiles()
+  })
   
+  
+  ### second tab
   ## plot1
   output$plot1 <- renderPlot({
 
@@ -163,12 +171,13 @@ server <- function(input, output){
   output$rank <- renderDataTable({
     covid19_tidy %>%
       group_by(state) %>%
-      summarize(confirmed_cases = n()) %>% 
+      summarize(Confirmed_Cases = n()) %>% 
       left_join(n_death, by = "state") %>% 
-      mutate(`death_rate(%)` = round((death_cases / confirmed_cases)*100, digits = 2),
-             `recovery_rate(%)` = round((recovery_cases / confirmed_cases)*100, digits = 2)) %>% 
-      mutate(rank_confirmed = rank(confirmed_cases),
-             rank_death_rate = rank(`death_rate(%)`, ties.method = "first"))
+      mutate(`Death_Rate(%)` = round((Death_Cases / Confirmed_Cases)*100, digits = 2),
+             `Recovery_rate(%)` = round((Recovery_Cases / Confirmed_Cases)*100, digits = 2)) %>% 
+      mutate(Rank_Confirmed = rank(Confirmed_Cases),
+             Rank_Death_Rate = rank(`Death_Rate(%)`, ties.method = "first")) %>% 
+      rename(State = state)
   }, options = list(pageLength = 10))
 
 }
