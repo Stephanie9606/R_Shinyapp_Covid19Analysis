@@ -6,7 +6,8 @@ library(ggplot2)
 library(leaflet)
 library(sf)
 library(lubridate)
-library("usmap")
+library(usmap)
+library(raster)
 
 readr::read_rds("./data/covid19_tidy.rds") -> 
   covid19_tidy
@@ -14,24 +15,32 @@ readr::read_rds("./data/covid19_tidy.rds") ->
 readr::read_rds("./data/covid19_lmdf.rds") -> 
   covid19_lmdf
 
-readr::read_rds("./data/covid19_by_state.rds") -> 
-  covid19_by_state
-
-readr::read_rds("./data/covid19_by_county.rds") -> 
-  covid19_by_county
+# readr::read_rds("./data/covid19_by_state.rds") -> 
+#   covid19_by_state
+# 
+# readr::read_rds("./data/covid19_by_county.rds") -> 
+#   covid19_by_county
 
 # count death cases
 covid19_tidy %>%
   group_by(state) %>% 
   count(death_yn) %>% 
   pivot_wider(names_from = death_yn, values_from = n) %>% 
-  rename(Death_Cases = Yes, Recovery_Cases = No, Status_Unknown = `NA`)
+  rename(Death_Cases = Yes, Recovery_Cases = No, Status_Unknown = `NA`)->
+  n_death
+
+covid19_tidy %>%
+  group_by(state, Latitude, Longitude) %>%
+  summarize(Confirmed_Cases = n()) %>% 
+  left_join(n_death, by = "state") %>% 
+  rename(State = state) -> geom_covid19
 
 
 # convert latitude and longitude data in csv to a simple features object
 covid19_tidy %>% 
   st_as_sf(coords = c("Longitude", "Latitude"),
            crs = 4326, agr = "field") -> cord_covid
+
 
 library(shiny)
 library(bslib)
@@ -47,19 +56,22 @@ ui <- fluidPage(
   # main pages
   tabsetPanel(type = "pills",
     tabPanel("Covid-19 USmap",
-             sidebarLayout(
-               sidebarPanel(
-                 checkboxInput("confm1", "Confirmed Cases"),
-                 checkboxInput("death1", "Death Cases"),
-                 sliderInput("Usslider", "Select date range",
-                             min = as.Date("2020-01-01","%Y-%m-%d"),
-                             max = as.Date("2021-03-01","%Y-%m-%d"),
-                             value = c(as.Date("2020-01-01"), as.Date("2021-03-01")), timeFormat="%Y-%m")
-               ),
-               mainPanel(
-                 leafletOutput("map")
-               )
-    ))
+             leafletOutput("map"),
+             absolutePanel(top = 10, right = 10,
+                           selectInput(inputId = "mapinput",
+                                       label = "Choose Case Type",
+                                       choices = c("Confirmed Cases", "Death Cases")))
+             # sidebarLayout(
+             #   sidebarPanel(
+             #     checkboxInput("confm1", "Confirmed Cases"),
+             #     checkboxInput("death1", "Death Cases"),
+             #     sliderInput("Usslider", "Select date range",
+             #                 min = as.Date("2020-01-01","%Y-%m-%d"),
+             #                 max = as.Date("2021-03-01","%Y-%m-%d"),
+             #                 value = c(as.Date("2020-01-01"), as.Date("2021-03-01")), timeFormat="%Y-%m")
+             #   ),
+             #   mainPanel(
+             #     leafletOutput("map")))
 
              # tabPanel("Covid-19 USmap",
              #          selectInput(inputId = "mapinput",
@@ -119,8 +131,9 @@ ui <- fluidPage(
     tabPanel("Ranking",
              dataTableOutput("rank")
     )
-  )
 )
+)  
+
 
 # Server
 server <- function(input, output){
@@ -128,6 +141,7 @@ server <- function(input, output){
   output$map <- renderLeaflet({
     leaflet() %>% 
       addTiles()
+      
   })
   
   
