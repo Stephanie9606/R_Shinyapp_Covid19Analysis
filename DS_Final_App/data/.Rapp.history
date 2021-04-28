@@ -1,1 +1,2 @@
 load("/Users/stephanie/Documents/Stat_613_DS/DS_final_project/DS_Final_App/Data/tidy_covid19_case.rds")
+load("/Users/trevor/Desktop/STAT613/fp_final-project-group-5/DS_Final_App/data/covid19_data.rds")

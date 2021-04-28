@@ -45,7 +45,7 @@ long_lat %>%
 
 covid19_tidy %>% 
   left_join(long_lat, by = c("res_state" = "abbr_state")) %>% 
-  filter(res_state != "GU", res_state !=  "VI", res_state != "PR") ->covid19_tidy
+  filter(res_state != "GU", res_state !=  "VI", res_state != "PR") -> covid19_tidy
 
 # covid19_tidy %>% 
 #   group_by(res_state)
@@ -58,13 +58,50 @@ covid19_tidy %>%
 
 #setdiff(unique(long_lat$abbr_state), unique(covid19_tidy$res_state))
 
+# only keep 2020 data
+covid19_tidy %>% 
+  select(-res_county) %>% 
+  filter(case_month != "2021-01-01") %>% 
+  filter(case_month != "2021-02-01") %>% 
+  filter(case_month != "2021-03-01") ->
+  covid19_tidy
+
 covid19_tidy %>% 
   saveRDS("../data/covid19_tidy.rds")
-
-readRDS("../data/covid19_tidy.rds") ->
-  tryreadrds  
 ```
 
+```{r}
+# for data analysis, lm and plot
+# cases
+covid19_tidy %>% 
+  group_by(res_state, symptom_status, sex, race, ethnicity, age_group) %>% 
+  count() %>% 
+  rename("case" = "n") ->
+  covid_lm_case
+
+# new data
+covid19_tidy %>% 
+  group_by(res_state, symptom_status, sex, race, ethnicity, age_group, death_yn) %>% 
+  count() %>% 
+  pivot_wider(names_from = death_yn, values_from = n) %>% 
+  rename("death" = "Yes",
+         "recovery" = "No") %>% 
+  select(-'NA') %>% 
+  left_join(covid_lm_case) ->
+  covid19_lmdf
+
+covid19_lmdf %>% 
+  glimpse()
+
+covid19_lmdf %>% 
+  mutate(symptom_status = as.factor(symptom_status),
+         race = as.factor(race),
+         ethnicity = as.factor(ethnicity)) ->
+  covid19_lmdf
+
+covid19_lmdf %>% 
+  saveRDS("../data/covid19_lmdf.rds")
+```
 
 
 

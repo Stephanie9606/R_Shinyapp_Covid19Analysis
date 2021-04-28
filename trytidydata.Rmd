@@ -84,6 +84,27 @@ covid19_tidy %>%
 ```
 
 ```{r}
-unique(covid19_tidy[c("res_state")])
+unique(covid19_tidy[c("current_status")])
+```
+
+```{r}
+covid19_lmdf %>% 
+  glimpse()
+
+# lm try
+lm(death~race, data = covid19_lmdf) -> lmout
+summary(lmout)
+
+# residual plot
+qplot(x = lmout$fitted, y = lmout$residuals)
+# QQ plot 
+qplot(sample = lmout$residuals, geom = "qq") +
+        geom_qq_line()
+
+# ggplot
+covid19_lmdf %>% 
+  drop_na(age_group, race) %>% 
+  ggplot(aes(x = age_group, y = race)) +
+  geom_jitter()
 ```
 
