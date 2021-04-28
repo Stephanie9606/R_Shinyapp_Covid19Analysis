@@ -6,7 +6,7 @@ library(ggplot2)
 library(leaflet)
 library(sf)
 library(lubridate)
-library("usmap")
+library(usmap)
 
 readr::read_rds("./data/covid19_tidy.rds") -> 
   covid19_tidy
