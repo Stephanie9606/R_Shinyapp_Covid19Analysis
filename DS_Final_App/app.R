@@ -28,10 +28,10 @@ covid19_tidy %>%
   pivot_wider(names_from = death_yn, values_from = n) %>% 
   rename(Death_Cases = Yes, Recovery_Cases = No, Status_Unknown = `NA`)->
   n_death
-
+# merge data
 covid19_tidy %>%
   group_by(state, Latitude, Longitude) %>%
-  summarize(Confirmed_Cases = n()) %>% 
+  summarize(Confirmed_Cases = n(), .group = "keep") %>% 
   left_join(n_death, by = "state") %>% 
   rename(State = state) -> geom_covid19
 
@@ -58,9 +58,8 @@ ui <- fluidPage(
     tabPanel("Covid-19 USmap",
              leafletOutput("map"),
              absolutePanel(top = 10, right = 10,
-                           selectInput(inputId = "mapinput",
-                                       label = "Choose Case Type",
-                                       choices = c("Confirmed Cases", "Death Cases")))
+                           varSelectInput("type1", "Covid19 Case Type", data = geom_covid19[c(4,7)]))
+        
              # sidebarLayout(
              #   sidebarPanel(
              #     checkboxInput("confm1", "Confirmed Cases"),
@@ -138,12 +137,27 @@ ui <- fluidPage(
 # Server
 server <- function(input, output){
   ### tab 1 Us map
-  output$map <- renderLeaflet({
-    leaflet() %>% 
-      addTiles()
-      
+  pal <- colorQuantile("Blue", NULL, n =5)
+
+  colorpal <- reactive({
+    if(input$type1 == "Confirmed_Cases"){
+      colorNumeric(geom_covid19$Confirmed_Cases)
+    } else {
+      colorNumeric(geom_covid19$Death_Cases)
+    }
+    colorpal
   })
   
+  output$map <- renderLeaflet({
+  leaflet(geom_covid19) %>% 
+      addProviderTiles(providers$CartoDB.Positron) %>% 
+      fitBounds(~min(Longitude), ~min(Latitude), ~max(Longitude), ~max(Latitude)) 
+      # addPolygons(data = geom_covid19,
+      #             fillColor = ~pal(colorpal),
+      #             fillOpacity = 0.4,
+      #             weight = 2,
+      #             color = "white")
+  })
   
   ### second tab
   ## plot1
@@ -286,9 +300,7 @@ server <- function(input, output){
   ### forth tab
   output$rank <- renderDataTable({
     covid19_tidy %>%
-      group_by(state) %>%
-      summarize(Confirmed_Cases = n()) %>% 
-      left_join(n_death, by = "state") %>% 
+   geom_covid19%>% 
       mutate(`Death_Rate(%)` = round((Death_Cases / Confirmed_Cases)*100, digits = 2),
              `Recovery_Rate(%)` = round((Recovery_Cases / Confirmed_Cases)*100, digits = 2)) %>% 
       mutate(Rank_Confirmed = rank(Confirmed_Cases),
