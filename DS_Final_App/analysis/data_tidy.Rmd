@@ -35,8 +35,8 @@ covid19_data %>%
 ```{r}
 # tidy data
 # merge long/lat for shiny map
-# only focus on the US 51 states
-# long/ lat data from [link]:
+# only focus on the US 50 + 1 (DC) states
+# long/ lat data from kaggle [link]:
 # https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations
 long_lat <- read_csv("../data/statelatlong.csv") 
   
@@ -47,15 +47,8 @@ covid19_tidy %>%
   left_join(long_lat, by = c("res_state" = "abbr_state")) %>% 
   filter(res_state != "GU", res_state !=  "VI", res_state != "PR") -> covid19_tidy
 
-# covid19_tidy %>% 
-#   group_by(res_state)
-# 
-# covid19_data %>% 
-#   filter(res_state == "DE")
-
 # check if we already removed GU, VI, PR, which are outside the US territories
 #setdiff(unique(covid19_tidy$res_state), unique(long_lat$abbr_state))
-
 #setdiff(unique(long_lat$abbr_state), unique(covid19_tidy$res_state))
 
 # only keep 2020 data
@@ -103,6 +96,30 @@ covid19_lmdf %>%
   saveRDS("../data/covid19_lmdf.rds")
 ```
 
+```{r}
+# count death cases
+covid19_tidy %>%
+  group_by(state) %>% 
+  count(death_yn) %>% 
+  pivot_wider(names_from = death_yn, values_from = n) %>% 
+  rename(Death_Cases = Yes, Recovery_Cases = No, Status_Unknown = `NA`)->
+  covid19_n_death
+
+# merge data
+covid19_tidy %>%
+  group_by(state, Latitude, Longitude) %>%
+  summarize(Confirmed_Cases = n()) %>% 
+  left_join(n_death, by = "state") %>% 
+  rename(State = state) -> covid19_geom
+
+
+# save to rds
+covid19_n_death %>% 
+  saveRDS("../data/covid19_n_death.rds")
+
+covid19_geom %>% 
+  saveRDS("../data/covid19_geom.rds")
+```
 
 
 

@@ -6,7 +6,6 @@ library(ggplot2)
 library(leaflet)
 library(sf)
 library(lubridate)
-library(usmap)
 library(raster)
 
 readr::read_rds("./data/covid19_tidy.rds") -> 
@@ -14,12 +13,6 @@ readr::read_rds("./data/covid19_tidy.rds") ->
 
 readr::read_rds("./data/covid19_lmdf.rds") -> 
   covid19_lmdf
-
-# readr::read_rds("./data/covid19_by_state.rds") -> 
-#   covid19_by_state
-# 
-# readr::read_rds("./data/covid19_by_county.rds") -> 
-#   covid19_by_county
 
 # count death cases
 covid19_tidy %>%
