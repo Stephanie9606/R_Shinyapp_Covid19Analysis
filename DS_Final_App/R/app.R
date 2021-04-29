@@ -113,7 +113,7 @@ server <- function(input, output){
   output$map <- renderLeaflet({
   leaflet(covid19_geom) %>% 
       addProviderTiles(providers$CartoDB.Positron) %>% 
-      setView(-98.35, 39.7, zoom = 4)
+      setView(-98.35, 39.7, zoom = 4) # set US boundary
       # addPolygons(data = geom_covid19,
       #             fillColor = ~pal(colorpal),
       #             fillOpacity = 0.4,
