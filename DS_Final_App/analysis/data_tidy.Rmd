@@ -41,10 +41,10 @@ covid19_data %>%
 long_lat <- read_csv("../data/statelatlong.csv") 
   
 long_lat %>% 
-  rename(state = City, abbr_state = State)-> long_lat
+  rename(State = City, `State(Abbrev)` = State)-> long_lat
 
 covid19_tidy %>% 
-  left_join(long_lat, by = c("res_state" = "abbr_state")) %>% 
+  left_join(long_lat, by = c("res_state" = "State(Abbrev)")) %>% 
   filter(res_state != "GU", res_state !=  "VI", res_state != "PR") -> covid19_tidy
 
 # check if we already removed GU, VI, PR, which are outside the US territories
@@ -58,27 +58,46 @@ covid19_tidy %>%
   filter(case_month != "2021-02-01") %>% 
   filter(case_month != "2021-03-01") ->
   covid19_tidy
+```
 
+```{r}
+# rename data
+covid19_tidy %>% 
+  rename(`Date(Monthly)` = case_month, 
+         `State(Abbrev)` = res_state, 
+         Age = age_group, 
+         Sex = sex, 
+         Race = race, 
+         Ethnicity = ethnicity, 
+         `Identified Process` = process, 
+         `Case Status` = current_status, 
+         `Symptom Status` = symptom_status, 
+         Hospitalization = hosp_yn, 
+         ICU = icu_yn, 
+         Death = death_yn, 
+         `Underlying Conditions`= underlying_conditions_yn) ->covid19_tidy
 covid19_tidy %>% 
   saveRDS("../data/covid19_tidy.rds")
 ```
+
+
 
 ```{r}
 # for data analysis, lm and plot
 # cases
 covid19_tidy %>% 
-  group_by(res_state, symptom_status, sex, race, ethnicity, age_group) %>% 
+  group_by(`State(Abbrev)`, `Symptom Status`, Sex, Race, Ethnicity, Age) %>% 
   count() %>% 
   rename("case" = "n") ->
   covid_lm_case
 
 # new data
 covid19_tidy %>% 
-  group_by(res_state, symptom_status, sex, race, ethnicity, age_group, death_yn) %>% 
+  group_by(`State(Abbrev)`, `Symptom Status`, Sex, Race, Ethnicity, Age, Death) %>% 
   count() %>% 
-  pivot_wider(names_from = death_yn, values_from = n) %>% 
-  rename("death" = "Yes",
-         "recovery" = "No") %>% 
+  pivot_wider(names_from = Death, values_from = n) %>% 
+  rename("Death" = "Yes",
+         "Recovery" = "No") %>% 
   select(-'NA') %>% 
   left_join(covid_lm_case) ->
   covid19_lmdf
@@ -87,9 +106,9 @@ covid19_lmdf %>%
   glimpse()
 
 covid19_lmdf %>% 
-  mutate(symptom_status = as.factor(symptom_status),
-         race = as.factor(race),
-         ethnicity = as.factor(ethnicity)) ->
+  mutate(`Symptom Status` = as.factor(`Symptom Status`),
+         Race = as.factor(Race),
+         Ethnicity = as.factor(Ethnicity)) ->
   covid19_lmdf
 
 covid19_lmdf %>% 
@@ -99,18 +118,17 @@ covid19_lmdf %>%
 ```{r}
 # count death cases
 covid19_tidy %>%
-  group_by(state) %>% 
-  count(death_yn) %>% 
-  pivot_wider(names_from = death_yn, values_from = n) %>% 
-  rename(Death_Cases = Yes, Recovery_Cases = No, Status_Unknown = `NA`)->
+  group_by(State) %>% 
+  count(Death) %>% 
+  pivot_wider(names_from = Death, values_from = n) %>% 
+  rename(`Number of Death` = Yes, `Number of Recovery` = No, `Status Unknown` = `NA`)->
   covid19_n_death
 
 # merge data
 covid19_tidy %>%
-  group_by(state, Latitude, Longitude) %>%
-  summarize(Confirmed_Cases = n()) %>% 
-  left_join(n_death, by = "state") %>% 
-  rename(State = state) -> covid19_geom
+  group_by(State, Latitude, Longitude) %>%
+  summarize(`Number of Confirmed` = n()) %>% 
+  left_join(covid19_n_death, by = "State") -> covid19_geom
 
 
 # save to rds

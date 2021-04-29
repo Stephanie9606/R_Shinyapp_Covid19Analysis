@@ -10,16 +10,16 @@ library(raster)
 library(shiny)
 library(bslib)
 
-readr::read_rds("./data/covid19_tidy.rds") -> 
+readr::read_rds("../data/covid19_tidy.rds") -> 
   covid19_tidy
 
-readr::read_rds("./data/covid19_lmdf.rds") -> 
+readr::read_rds("../data/covid19_lmdf.rds") -> 
   covid19_lmdf
 
-readr::read_rds("./data/covid19_n_death.rds") -> 
+readr::read_rds("../data/covid19_n_death.rds") -> 
   covid19_n_death
 
-readr::read_rds("./data/covid19_geom.rds") -> 
+readr::read_rds("../data/covid19_geom.rds") -> 
   covid19_geom
 
 # if not necessary in map, we can just delete it(leaflet map may need it)
@@ -41,14 +41,14 @@ ui <- fluidPage(
     tabPanel("Covid-19 USmap",
              leafletOutput("map"),
              absolutePanel(top = 10, right = 10,
-                           varSelectInput("type1", "Covid19 Case Type", data = geom_covid19[c(4,7)]))
+                           varSelectInput("type1", "Covid19 Case Type", data = covid19_geom[c(4,6)]))
         
     ),
     tabPanel("Plot Analysis",
       sidebarLayout(
         sidebarPanel(
           radioButtons("rbuts1", "What type of the data are you interested in?", choices = case_types, selected = "Case"),
-          varSelectInput("var1", "Check the data based on?", data = covid19_tidy, selected = "res_state"),
+          varSelectInput("var1", "Check the data based on?", data = covid19_tidy, selected = "`State(Abbrev)`"),
           sliderInput("slider1", "Select date range",
                       min = as.Date("2020-01-01","%Y-%m-%d"),
                       max = as.Date("2020-12-01","%Y-%m-%d"),
@@ -99,19 +99,19 @@ ui <- fluidPage(
 # Server
 server <- function(input, output){
   ### tab 1 Us map
-  pal <- colorQuantile("Blue", NULL, n =5)
-
-  colorpal <- reactive({
-    if(input$type1 == "Confirmed_Cases"){
-      colorNumeric(geom_covid19$Confirmed_Cases)
-    } else {
-      colorNumeric(geom_covid19$Death_Cases)
-    }
-    colorpal
-  })
+  # pal <- colorQuantile("Blue", NULL, n =5)
+  # 
+  # colorpal <- reactive({
+  #   if(input$type1 == "Number of confirmed"){
+  #     colorNumeric(geom_covid19$Confirmed_Cases)
+  #   } else {
+  #     colorNumeric(geom_covid19$Death_Cases)
+  #   }
+  #   colorpal
+  # })
   
   output$map <- renderLeaflet({
-  leaflet(geom_covid19) %>% 
+  leaflet(covid19_geom) %>% 
       addProviderTiles(providers$CartoDB.Positron) %>% 
       fitBounds(~min(Longitude), ~min(Latitude), ~max(Longitude), ~max(Latitude)) 
       # addPolygons(data = geom_covid19,
@@ -130,34 +130,34 @@ server <- function(input, output){
       d1 <- covid19_tidy
     } else if(input$rbuts1 == "Death"){
       d1 <- covid19_tidy %>% 
-        filter(death_yn == "Yes")
+        filter(Death == "Yes")
     } else if(input$rbuts1 == "Hospitalization"){
       d1 <- covid19_tidy %>% 
-        filter(hosp_yn == "Yes")
+        filter(Hospitalization == "Yes")
     } else if(input$rbuts1 == "ICU"){
       d1 <- covid19_tidy %>% 
-        filter(icu_yn == "Yes")
+        filter(ICU == "Yes")
     } else if(input$rbuts1 == "Underlying"){
       d1 <- covid19_tidy %>% 
-        filter(underlying_conditions_yn == "Yes")
+        filter(`Underlying Conditions` == "Yes")
     }
     
     # filter date
     filter_date <- reactive({
      d1 %>%
-        filter(between(case_month, input$slider1[1], input$slider1[2]))
+        filter(between(`Date(Monthly)`, input$slider1[1], input$slider1[2]))
     })
     
     # reactive for plot1
     total_case <- reactive({
       filter_date() %>% 
-        group_by(case_month, !!input$var1) %>% 
+        group_by(`Date(Monthly)`, !!input$var1) %>% 
         summarise(n = n(), .groups = "keep") %>% 
         drop_na(!!input$var1)
     })
     
     # modularity
-    p1 <- ggplot(total_case(), aes(x = case_month, y = n, color = !!input$var1)) +
+    p1 <- ggplot(total_case(), aes(x = `Date(Monthly)`, y = n, color = !!input$var1)) +
       geom_smooth(se = F) +
       labs(x = "Date") +
       theme_bw()
@@ -174,28 +174,28 @@ server <- function(input, output){
       d2 <- covid19_tidy
     } else if(input$rbuts1 == "Death"){
       d2 <- covid19_tidy %>% 
-        filter(death_yn == "Yes")
+        filter(Death == "Yes")
     } else if(input$rbuts1 == "Hospitalization"){
       d2 <- covid19_tidy %>% 
-        filter(hosp_yn == "Yes")
+        filter(Hospitalization == "Yes")
     } else if(input$rbuts1 == "ICU"){
       d2 <- covid19_tidy %>% 
-        filter(icu_yn == "Yes")
+        filter(ICU == "Yes")
     } else if(input$rbuts1 == "Underlying"){
       d2 <- covid19_tidy %>% 
-        filter(underlying_conditions_yn == "Yes")
+        filter(`Underlying Conditions` == "Yes")
     }
     
     # reactive for plot2
     race_df <- reactive({
       d2 %>% 
-        group_by(race, !!input$var1) %>% 
+        group_by(Race, !!input$var1) %>% 
         summarise(total_case = n(), .groups = "keep") %>% 
         drop_na(!!input$var1)
     })
     
     # modularity
-    p2 <- ggplot(race_df(), aes(x = !!input$var1, y = total_case, fill = race)) +
+    p2 <- ggplot(race_df(), aes(x = !!input$var1, y = total_case, fill = Race)) +
       geom_col() +
       coord_flip() +
       theme_bw()
@@ -261,13 +261,11 @@ server <- function(input, output){
   
   ### forth tab
   output$rank <- renderDataTable({
-    covid19_tidy %>%
-   geom_covid19%>% 
-      mutate(`Death_Rate(%)` = round((Death_Cases / Confirmed_Cases)*100, digits = 2),
-             `Recovery_Rate(%)` = round((Recovery_Cases / Confirmed_Cases)*100, digits = 2)) %>% 
-      mutate(Rank_Confirmed = rank(Confirmed_Cases),
-             Rank_Death_Rate = rank(`Death_Rate(%)`, ties.method = "first")) %>% 
-      rename(State = state)
+   covid19_geom %>% 
+      mutate(`Death Rate(%)` = round((`Number of Death` / `Number of Confirmed`)*100, digits = 2),
+             `Recovery Rate(%)` = round((`Number of Recovery` / `Number of Confirmed`)*100, digits = 2),
+             `Rank(Confirmed)` = rank(`Number of Confirmed`),
+             `Rank(Death Rate)` = rank(`Death Rate(%)`, ties.method = "first"))
   }, options = list(pageLength = 10))
   
 }
