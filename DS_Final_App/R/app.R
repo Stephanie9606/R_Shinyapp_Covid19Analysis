@@ -7,6 +7,8 @@ library(leaflet)
 library(sf)
 library(lubridate)
 library(raster)
+library(shiny)
+library(bslib)
 
 readr::read_rds("./data/covid19_tidy.rds") -> 
   covid19_tidy
@@ -14,29 +16,17 @@ readr::read_rds("./data/covid19_tidy.rds") ->
 readr::read_rds("./data/covid19_lmdf.rds") -> 
   covid19_lmdf
 
-# count death cases
-covid19_tidy %>%
-  group_by(state) %>% 
-  count(death_yn) %>% 
-  pivot_wider(names_from = death_yn, values_from = n) %>% 
-  rename(Death_Cases = Yes, Recovery_Cases = No, Status_Unknown = `NA`)->
-  n_death
-# merge data
-covid19_tidy %>%
-  group_by(state, Latitude, Longitude) %>%
-  summarize(Confirmed_Cases = n(), .group = "keep") %>% 
-  left_join(n_death, by = "state") %>% 
-  rename(State = state) -> geom_covid19
+readr::read_rds("./data/covid19_n_death.rds") -> 
+  covid19_n_death
 
+readr::read_rds("./data/covid19_geom.rds") -> 
+  covid19_geom
 
+# if not necessary in map, we can just delete it(leaflet map may need it)
 # convert latitude and longitude data in csv to a simple features object
 covid19_tidy %>% 
   st_as_sf(coords = c("Longitude", "Latitude"),
            crs = 4326, agr = "field") -> cord_covid
-
-
-library(shiny)
-library(bslib)
 
 # rbuts1 choices
 case_types <- c("Case", "Death", "Hospitalization", "ICU", "Underlying")
@@ -53,27 +43,6 @@ ui <- fluidPage(
              absolutePanel(top = 10, right = 10,
                            varSelectInput("type1", "Covid19 Case Type", data = geom_covid19[c(4,7)]))
         
-             # sidebarLayout(
-             #   sidebarPanel(
-             #     checkboxInput("confm1", "Confirmed Cases"),
-             #     checkboxInput("death1", "Death Cases"),
-             #     sliderInput("Usslider", "Select date range",
-             #                 min = as.Date("2020-01-01","%Y-%m-%d"),
-             #                 max = as.Date("2021-03-01","%Y-%m-%d"),
-             #                 value = c(as.Date("2020-01-01"), as.Date("2021-03-01")), timeFormat="%Y-%m")
-             #   ),
-             #   mainPanel(
-             #     leafletOutput("map")))
-
-             # tabPanel("Covid-19 USmap",
-             #          selectInput(inputId = "mapinput",
-             #                      label = "Choose Map Type",
-             #                      choices = c("By State", "By County"),
-             #                      mainPanel(
-             #                        plotOutput("map")
-             #                      )
-             #          )
-             # )
     ),
     tabPanel("Plot Analysis",
       sidebarLayout(
@@ -301,23 +270,6 @@ server <- function(input, output){
       rename(State = state)
   }, options = list(pageLength = 10))
   
-#   output$map <- reactive({
-#     if (input$mapinput == "By State"){
-#       
-#       p <- plot_usmap(data = covid19_by_state, values = "Cases", color = "white", labels = FALSE) + 
-#         scale_fill_continuous(name = "Number of Cases", label = scales::comma) + 
-#         theme(legend.position = "right")+
-#         labs(title = "Cases of COVID-19 by State")
-#       
-#     } else {
-#       
-#       p <- plot_usmap(data = covid19_by_county, values = "Cases", labels = FALSE) + 
-#         scale_fill_continuous(name = "Number of Cases", label = scales::comma) + 
-#         theme(legend.position = "right")+
-#         labs(title = "Cases of COVID-19 by County")
-#     }
-#     p
-# })
 }
 
 
