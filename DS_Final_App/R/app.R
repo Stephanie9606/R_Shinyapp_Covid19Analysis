@@ -113,7 +113,7 @@ server <- function(input, output){
   output$map <- renderLeaflet({
   leaflet(covid19_geom) %>% 
       addProviderTiles(providers$CartoDB.Positron) %>% 
-      fitBounds(~min(Longitude), ~min(Latitude), ~max(Longitude), ~max(Latitude)) 
+      setView(-98.35, 39.7, zoom = 4)
       # addPolygons(data = geom_covid19,
       #             fillColor = ~pal(colorpal),
       #             fillOpacity = 0.4,
@@ -264,8 +264,8 @@ server <- function(input, output){
    covid19_geom %>% 
       mutate(`Death Rate(%)` = round((`Number of Death` / `Number of Confirmed`)*100, digits = 2),
              `Recovery Rate(%)` = round((`Number of Recovery` / `Number of Confirmed`)*100, digits = 2),
-             `Rank(Confirmed)` = rank(`Number of Confirmed`),
-             `Rank(Death Rate)` = rank(`Death Rate(%)`, ties.method = "first"))
+             `Rank(Confirmed)` = rank(as.numeric(`Number of Confirmed`)),
+             `Rank(Death Rate)` = rank(as.numeric(`Death Rate(%)`), ties.method = "first"))
   }, options = list(pageLength = 10))
   
 }

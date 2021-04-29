@@ -76,7 +76,7 @@ covid19_tidy %>%
          ICU = icu_yn, 
          Death = death_yn, 
          `Underlying Conditions`= underlying_conditions_yn) ->covid19_tidy
-covid19_tidy %>% 
+covid19_tidy %>%
   saveRDS("../data/covid19_tidy.rds")
 ```
 
@@ -128,7 +128,7 @@ covid19_tidy %>%
 covid19_tidy %>%
   group_by(State, Latitude, Longitude) %>%
   summarize(`Number of Confirmed` = n()) %>% 
-  left_join(covid19_n_death, by = "State") -> covid19_geom
+  left_join(covid19_n_death, by = "State")-> covid19_geom
 
 
 # save to rds
