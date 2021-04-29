@@ -208,8 +208,15 @@ server <- function(input, output){
   # ggplot
   output$ggplotlm <- renderPlot({
     
+    # reactive for ggplotlm
+    plot_lm <- reactive({
+      covid19_lmdf %>% 
+        drop_na(!!input$var2) %>% 
+        drop_na(!!input$var3)
+    })
+    
     # modularity
-    gglm <- ggplot(data = covid19_lmdf, aes(x = !!input$var2, y = !!input$var3))
+    gglm <- ggplot(data = plot_lm(), aes(x = !!input$var2, y = !!input$var3))
     
     # if-else numeric/factor
     if(is.numeric(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
@@ -220,10 +227,12 @@ server <- function(input, output){
         geom_jitter()
     } else if (is.factor(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
       gglm <- gglm +
-        geom_boxplot()
-    } else{
+        geom_boxplot() +
+        scale_y_log10()
+    } else if (is.numeric(covid19_lmdf[[input$var2]]) && is.factor(covid19_lmdf[[input$var3]])){
       gglm <- gglm +
-        ggstance::geom_boxploth()
+        geom_boxplot() +
+        scale_x_log10()
     }
     
     # output gglm
@@ -232,18 +241,31 @@ server <- function(input, output){
   
   # lm summary
   output$slm <- renderPrint({
-    lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]], data = covid19_lmdf)
-    print(summary(lmout), digits = 2)
+    # if y input is numeric print lm
+    if(is.numeric(covid19_lmdf[[input$var3]])) {
+      lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]], data = covid19_lmdf)
+      print(summary(lmout), digits = 2)
+    }
+    
+    validate(
+      need(is.numeric(covid19_lmdf[[input$var3]]), "Please select Y as Numeric Variable to Check out Linear Model Summary!")
+    )
   })
   
   # optional: residual plot
   output$plotrsd <- renderPlot({
+    # if check to see residual plot
     if(isTRUE(input$cbox1)){
-      lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]])
-      qplot(x = lmout$fitted, y = lmout$residuals,
-            main = "Residuals vs Fitted",
-            xlab = "x",
-            ylab = "y")
+      # if y input is numeric print plot
+      if(is.numeric(covid19_lmdf[[input$var3]])) {
+        lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]])
+        qplot(x = lmout$fitted, y = lmout$residuals,
+              main = "Residuals vs Fitted")
+      }
+      
+      validate(
+        need(is.numeric(covid19_lmdf[[input$var3]]), "Please select Y as Numeric Variable to Check out Risidual Plot!")
+      )
     }
   })
   
