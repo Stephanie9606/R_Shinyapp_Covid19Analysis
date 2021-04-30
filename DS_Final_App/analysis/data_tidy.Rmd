@@ -8,6 +8,7 @@ output: pdf_document
 ```{r message=FALSE}
 library(tidyverse)
 library(lubridate)
+library(tidycensus)
 ```
 
 
@@ -128,7 +129,23 @@ covid19_tidy %>%
 covid19_tidy %>%
   group_by(State, Latitude, Longitude) %>%
   summarize(`Number of Confirmed` = n()) %>% 
-  left_join(covid19_n_death, by = "State")-> covid19_geom
+  left_join(covid19_n_death, by = "State") %>% 
+  ungroup() %>% 
+  mutate(`Death Rate(%)` = round((`Number of Death` / `Number of Confirmed`)*100, digits = 2),
+             `Recovery Rate(%)` = round((`Number of Recovery` / `Number of Confirmed`)*100, digits = 2),
+             `Rank(Confirmed)` = rank(-`Number of Confirmed`, na.last = TRUE),
+             `Rank(Death Rate)` = rank(`Death Rate(%)`, ties.method = "first", na.last = TRUE))->covid19_geom
+
+# filter out fips code in the beginning since data is too large, merge only state fips here
+data("fips_codes")
+state_fips <- fips_codes %>% 
+  select(state_name, state_code) %>% 
+  unique()
+
+covid19_geom %>% 
+  left_join(state_fips, by = c("State" = "state_name")) %>% 
+  select(state_code, everything())->covid19_geom
+
 
 
 # save to rds

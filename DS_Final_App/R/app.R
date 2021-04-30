@@ -97,7 +97,7 @@ ui <- fluidPage(
                       ),
                column(4, plotOutput("rateR")
                       ),
-               column(4, plotOutput("rankD"))
+               column(4, plotOutput("rateD"))
       ),
       fluidRow(
         column(12, dataTableOutput("rank"))
@@ -271,13 +271,31 @@ server <- function(input, output){
   })
   
   ### forth tab
+  
+  output$rateR <- renderPlot({
+    
+    if(input$var4){
+      plot_usmap(data = covid19_geom, values = "Recovery Rate(%)", color = "blue")+
+        scale_fill_continuous(low ="white", high = "red",
+                              name = "Death Rate(%)", label = scales::comma)+
+        labs(title = "Covid-19 Recovery Rate",
+             subtitle = paste0("Death Rate by States in 2020"))+
+        theme(panel.background = element_rect(color = "black", fill = "white"))+
+        theme(legend.position = "top")
+    } else if (input$var5) {
+      plot_usmap(data = covid19_geom, values = "Death Rate(%)", color = "blue")+
+      scale_fill_continuous(low ="white", high = "red",
+                            name = "Death Rate(%)", label = scales::comma)+
+      labs(title = "Covid-19 Death Rate",
+           subtitle = paste0("Death Rate by States in 2020"))+
+      theme(panel.background = element_rect(color = "black", fill = "white"))+
+      theme(legend.position = "top")
+    }
+    
+  })
+  
   output$rank <- renderDataTable({
-      covid19_geom %>% 
-      ungroup() %>% 
-      mutate(`Death Rate(%)` = round((`Number of Death` / `Number of Confirmed`)*100, digits = 2),
-             `Recovery Rate(%)` = round((`Number of Recovery` / `Number of Confirmed`)*100, digits = 2),
-             `Rank(Confirmed)` = rank(-`Number of Confirmed`, na.last = TRUE),
-             `Rank(Death Rate)` = rank(`Death Rate(%)`, ties.method = "first", na.last = TRUE)) %>% 
+      covid19_geom %>%
       dplyr::select(State, `Rank(Confirmed)`, `Number of Confirmed`, 
              `Number of Recovery`, `Recovery Rate(%)`, `Number of Death`, `Rank(Death Rate)`,
              `Death Rate(%)`, `Status Unknown`)
