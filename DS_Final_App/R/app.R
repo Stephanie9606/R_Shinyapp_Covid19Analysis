@@ -275,9 +275,6 @@ server <- function(input, output){
   
   output$rPlot <- renderPlot({
     
-    covid19_geom %>% 
-      rename(fips = state_code)->tts
-    
     if (isTRUE(input$var4)) {
       plot_usmap(data = covid19_geom, values = "Recovery Rate(%)", color = "blue")+
         scale_fill_continuous(low ="white", high = "red",
@@ -306,7 +303,11 @@ server <- function(input, output){
       dplyr::select(State, `Rank(Confirmed)`, `Number of Confirmed`, 
              `Number of Recovery`, `Recovery Rate(%)`, `Number of Death`, `Rank(Death Rate)`,
              `Death Rate(%)`, `Status Unknown`)
-  }, options = list(pageLength = 10))
+  }, options = list(pageLength = 10, 
+                    autoWidth = FALSE, 
+                    columnDefs = list(list(width = '600px', targets = "2")),
+                    scrollx = TRUE
+                    ))
   
 
 }
