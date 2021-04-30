@@ -261,11 +261,15 @@ server <- function(input, output){
   
   ### forth tab
   output$rank <- renderDataTable({
-   covid19_geom %>% 
+      covid19_geom %>% 
+      ungroup() %>% 
       mutate(`Death Rate(%)` = round((`Number of Death` / `Number of Confirmed`)*100, digits = 2),
              `Recovery Rate(%)` = round((`Number of Recovery` / `Number of Confirmed`)*100, digits = 2),
-             `Rank(Confirmed)` = rank(as.numeric(`Number of Confirmed`)),
-             `Rank(Death Rate)` = rank(as.numeric(`Death Rate(%)`), ties.method = "first"))
+             `Rank(Confirmed)` = rank(-`Number of Confirmed`, na.last = TRUE),
+             `Rank(Death Rate)` = rank(`Death Rate(%)`, ties.method = "first", na.last = TRUE)) %>% 
+      dplyr::select(State, `Rank(Confirmed)`, `Number of Confirmed`, 
+             `Number of Recovery`, `Recovery Rate(%)`, `Number of Death`, `Rank(Death Rate)`,
+             `Death Rate(%)`, `Status Unknown`)
   }, options = list(pageLength = 10))
   
 }
