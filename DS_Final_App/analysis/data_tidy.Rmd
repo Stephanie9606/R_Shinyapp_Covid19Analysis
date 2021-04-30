@@ -89,7 +89,7 @@ covid19_tidy %>%
 covid19_tidy %>% 
   group_by(`State(Abbrev)`, `Symptom Status`, Sex, Race, Ethnicity, Age) %>% 
   count() %>% 
-  rename("case" = "n") ->
+  rename("Case" = "n") ->
   covid_lm_case
 
 # new data
@@ -144,9 +144,8 @@ state_fips <- fips_codes %>%
 
 covid19_geom %>% 
   left_join(state_fips, by = c("State" = "state_name")) %>% 
-  select(state_code, everything())->covid19_geom
-
-
+  select(state_code, everything()) %>% 
+  rename(fips = state_code)->covid19_geom
 
 # save to rds
 covid19_n_death %>% 

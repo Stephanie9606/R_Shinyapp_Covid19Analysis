@@ -95,9 +95,10 @@ ui <- fluidPage(
                       checkboxInput("var4", "Rate of Recovery"),
                       checkboxInput("var5", "Rate of Death")
                       ),
-               column(4, plotOutput("rateR")
+               column(4, plotOutput("rPlot")
                       ),
-               column(4, plotOutput("rateD"))
+               column(4, plotOutput("dPlot")
+                      )
       ),
       fluidRow(
         column(12, dataTableOutput("rank"))
@@ -272,38 +273,43 @@ server <- function(input, output){
   
   ### forth tab
   
-  output$rateR <- renderPlot({
+  output$rPlot <- renderPlot({
     
-    if(input$var4){
+    covid19_geom %>% 
+      rename(fips = state_code)->tts
+    
+    if (isTRUE(input$var4)) {
       plot_usmap(data = covid19_geom, values = "Recovery Rate(%)", color = "blue")+
         scale_fill_continuous(low ="white", high = "red",
-                              name = "Death Rate(%)", label = scales::comma)+
+                              name = "Recovery Rate(%)", label = scales::comma)+
         labs(title = "Covid-19 Recovery Rate",
-             subtitle = paste0("Death Rate by States in 2020"))+
+             subtitle = paste0("Recovery Rate by States in 2020"))+
         theme(panel.background = element_rect(color = "black", fill = "white"))+
         theme(legend.position = "top")
-    } else if (input$var5) {
-      plot_usmap(data = covid19_geom, values = "Death Rate(%)", color = "blue")+
-      scale_fill_continuous(low ="white", high = "red",
-                            name = "Death Rate(%)", label = scales::comma)+
-      labs(title = "Covid-19 Death Rate",
-           subtitle = paste0("Death Rate by States in 2020"))+
-      theme(panel.background = element_rect(color = "black", fill = "white"))+
-      theme(legend.position = "top")
     }
-    
   })
+  output$dPlot <- renderPlot({ 
+    if (isTRUE(input$var5)) {
+          plot_usmap(data = covid19_geom, values = "Death Rate(%)", color = "blue")+
+          scale_fill_continuous(low ="white", high = "red",
+                                name = "Death Rate(%)", label = scales::comma)+
+          labs(title = "Covid-19 Death Rate",
+               subtitle = paste0("Death Rate by States in 2020"))+
+          theme(panel.background = element_rect(color = "black", fill = "white"))+
+          theme(legend.position = "top")
+    }
+ })
   
   output$rank <- renderDataTable({
+    
       covid19_geom %>%
       dplyr::select(State, `Rank(Confirmed)`, `Number of Confirmed`, 
              `Number of Recovery`, `Recovery Rate(%)`, `Number of Death`, `Rank(Death Rate)`,
              `Death Rate(%)`, `Status Unknown`)
   }, options = list(pageLength = 10))
   
+
 }
-
-
 
 # Application
 
