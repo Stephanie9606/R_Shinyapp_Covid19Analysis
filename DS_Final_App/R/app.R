@@ -9,6 +9,7 @@ library(lubridate)
 library(raster)
 library(shiny)
 library(bslib)
+library(usmap)
 
 readr::read_rds("../data/covid19_tidy.rds") -> 
   covid19_tidy
@@ -90,10 +91,20 @@ ui <- fluidPage(
              
     ),
     tabPanel("Ranking",
-             dataTableOutput("rank")
+      fluidRow(column(4,
+                      checkboxInput("var4", "Rate of Recovery"),
+                      checkboxInput("var5", "Rate of Death")
+                      ),
+               column(4, plotOutput("rateR")
+                      ),
+               column(4, plotOutput("rankD"))
+      ),
+      fluidRow(
+        column(12, dataTableOutput("rank"))
+      ))
+             
     )
 )
-)  
 
 
 # Server
