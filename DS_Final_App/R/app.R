@@ -9,6 +9,7 @@ library(lubridate)
 library(raster)
 library(shiny)
 library(bslib)
+library(usmap)
 
 readr::read_rds("../data/covid19_tidy.rds") -> 
   covid19_tidy
@@ -90,10 +91,21 @@ ui <- fluidPage(
              
     ),
     tabPanel("Ranking",
-             dataTableOutput("rank")
+      fluidRow(column(4,
+                      checkboxInput("var4", "Rate of Recovery"),
+                      checkboxInput("var5", "Rate of Death")
+                      ),
+               column(4, plotOutput("rPlot")
+                      ),
+               column(4, plotOutput("dPlot")
+                      )
+      ),
+      fluidRow(
+        column(12, dataTableOutput("rank"))
+      ))
+             
     )
 )
-)  
 
 
 # Server
@@ -282,17 +294,76 @@ server <- function(input, output){
   })
   
   ### forth tab
-  output$rank <- renderDataTable({
-   covid19_geom %>% 
-      mutate(`Death Rate(%)` = round((`Number of Death` / `Number of Confirmed`)*100, digits = 2),
-             `Recovery Rate(%)` = round((`Number of Recovery` / `Number of Confirmed`)*100, digits = 2),
-             `Rank(Confirmed)` = rank(as.numeric(`Number of Confirmed`)),
-             `Rank(Death Rate)` = rank(as.numeric(`Death Rate(%)`), ties.method = "first"))
-  }, options = list(pageLength = 10))
   
+  output$rPlot <- renderPlot({
+    
+    if (isTRUE(input$var4)) {
+      plot_usmap(data = covid19_geom, values = "Recovery Rate(%)", color = "blue")+
+        scale_fill_continuous(low ="white", high = "red",
+                              name = "Recovery Rate(%)", label = scales::comma)+
+        labs(title = "Covid-19 Recovery Rate",
+             subtitle = paste0("Recovery Rate by States in 2020"))+
+        theme(panel.background = element_rect(color = "black", fill = "white"))+
+        theme(legend.position = "top")
+      
+      output$rank <- renderDataTable({
+        covid19_geom %>%
+          dplyr::select(State, `Number of Recovery`, `Recovery Rate(%)`)
+      }, options = list(pageLength = 10, 
+                        autoWidth = FALSE, 
+                        columnDefs = list(list(width = '600px', targets = "2")),
+                        scrollx = TRUE
+      ))
+      
+    } else {
+      output$rank <- renderDataTable({
+        
+        covid19_geom %>%
+          dplyr::select(State, `Rank(Confirmed)`, `Number of Confirmed`, 
+                        `Number of Recovery`, `Recovery Rate(%)`, `Number of Death`, `Rank(Death Rate)`,
+                        `Death Rate(%)`, `Status Unknown`)
+      }, options = list(pageLength = 10, 
+                        autoWidth = FALSE, 
+                        columnDefs = list(list(width = '600px', targets = "2")),
+                        scrollx = TRUE
+      ))
+    }
+  })
+  output$dPlot <- renderPlot({ 
+    if (isTRUE(input$var5)) {
+          plot_usmap(data = covid19_geom, values = "Death Rate(%)", color = "blue")+
+          scale_fill_continuous(low ="white", high = "red",
+                                name = "Death Rate(%)", label = scales::comma)+
+          labs(title = "Covid-19 Death Rate",
+               subtitle = paste0("Death Rate by States in 2020"))+
+          theme(panel.background = element_rect(color = "black", fill = "white"))+
+          theme(legend.position = "top")
+      
+      output$rank <- renderDataTable({
+        covid19_geom %>%
+          dplyr::select(State, `Number of Death`, `Rank(Death Rate)`, `Death Rate(%)`)
+      }, options = list(pageLength = 10, 
+                        autoWidth = FALSE, 
+                        columnDefs = list(list(width = '600px', targets = "2")),
+                        scrollx = TRUE
+      ))
+    } else {
+      output$rank <- renderDataTable({
+        
+        covid19_geom %>%
+          dplyr::select(State, `Rank(Confirmed)`, `Number of Confirmed`, 
+                        `Number of Recovery`, `Recovery Rate(%)`, `Number of Death`, `Rank(Death Rate)`,
+                        `Death Rate(%)`, `Status Unknown`)
+      }, options = list(pageLength = 10, 
+                        autoWidth = FALSE, 
+                        columnDefs = list(list(width = '600px', targets = "2")),
+                        scrollx = TRUE
+      ))
+    }
+ })
+  
+ 
 }
-
-
 
 # Application
 
