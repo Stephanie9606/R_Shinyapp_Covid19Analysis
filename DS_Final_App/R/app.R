@@ -159,7 +159,7 @@ server <- function(input, output){
     # modularity
     p1 <- ggplot(total_case(), aes(x = `Date(Monthly)`, y = n, color = !!input$var1)) +
       geom_smooth(se = F) +
-      labs(x = "Date") +
+      geom_text(aes(label = !!input$var1, color = !!input$var1)) +
       theme_bw()
     
     # output plot1
@@ -256,28 +256,35 @@ server <- function(input, output){
   output$plotrsd <- renderPlot({
     # if check to see residual plot
     if(isTRUE(input$cbox1)){
-      # if y input is numeric print plot
-      if(is.numeric(covid19_lmdf[[input$var3]])) {
+      # if y input is factor print plot
+      if(is.factor(covid19_lmdf[[input$var3]])) {
+        validate(
+          need(is.numeric(covid19_lmdf[[input$var3]]), "Please select Y as Numeric Variable to Check out Risidual Plot!")
+        )
+      } else{
         lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]])
         qplot(x = lmout$fitted, y = lmout$residuals,
               main = "Residuals vs Fitted")
       }
-      
-      validate(
-        need(is.numeric(covid19_lmdf[[input$var3]]), "Please select Y as Numeric Variable to Check out Risidual Plot!")
-      )
     }
   })
   
   # optional: QQ plot 
   output$plotqq <- renderPlot({
     if(isTRUE(input$cbox2)){
-      lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]])
-      qplot(sample = lmout$residuals, geom = "qq",
-            main = "QQ Plot",
-            xlab = "theoretical",
-            ylab = "sample") +
-        geom_qq_line()
+      # if y input is factor print plot
+      if(is.factor(covid19_lmdf[[input$var3]])) {
+        validate(
+          need(is.numeric(covid19_lmdf[[input$var3]]), "Please select Y as Numeric Variable to Check out QQ Plot!")
+        )
+      } else{
+        lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]])
+        qplot(sample = lmout$residuals, geom = "qq",
+              main = "QQ Plot",
+              xlab = "theoretical",
+              ylab = "sample") +
+          geom_qq_line()
+      }
     }
   })
   
