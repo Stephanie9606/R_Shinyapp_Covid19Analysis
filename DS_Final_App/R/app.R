@@ -283,6 +283,28 @@ server <- function(input, output){
              subtitle = paste0("Recovery Rate by States in 2020"))+
         theme(panel.background = element_rect(color = "black", fill = "white"))+
         theme(legend.position = "top")
+      
+      output$rank <- renderDataTable({
+        covid19_geom %>%
+          dplyr::select(State, `Number of Recovery`, `Recovery Rate(%)`)
+      }, options = list(pageLength = 10, 
+                        autoWidth = FALSE, 
+                        columnDefs = list(list(width = '600px', targets = "2")),
+                        scrollx = TRUE
+      ))
+      
+    } else {
+      output$rank <- renderDataTable({
+        
+        covid19_geom %>%
+          dplyr::select(State, `Rank(Confirmed)`, `Number of Confirmed`, 
+                        `Number of Recovery`, `Recovery Rate(%)`, `Number of Death`, `Rank(Death Rate)`,
+                        `Death Rate(%)`, `Status Unknown`)
+      }, options = list(pageLength = 10, 
+                        autoWidth = FALSE, 
+                        columnDefs = list(list(width = '600px', targets = "2")),
+                        scrollx = TRUE
+      ))
     }
   })
   output$dPlot <- renderPlot({ 
@@ -294,22 +316,31 @@ server <- function(input, output){
                subtitle = paste0("Death Rate by States in 2020"))+
           theme(panel.background = element_rect(color = "black", fill = "white"))+
           theme(legend.position = "top")
+      
+      output$rank <- renderDataTable({
+        covid19_geom %>%
+          dplyr::select(State, `Number of Death`, `Rank(Death Rate)`, `Death Rate(%)`)
+      }, options = list(pageLength = 10, 
+                        autoWidth = FALSE, 
+                        columnDefs = list(list(width = '600px', targets = "2")),
+                        scrollx = TRUE
+      ))
+    } else {
+      output$rank <- renderDataTable({
+        
+        covid19_geom %>%
+          dplyr::select(State, `Rank(Confirmed)`, `Number of Confirmed`, 
+                        `Number of Recovery`, `Recovery Rate(%)`, `Number of Death`, `Rank(Death Rate)`,
+                        `Death Rate(%)`, `Status Unknown`)
+      }, options = list(pageLength = 10, 
+                        autoWidth = FALSE, 
+                        columnDefs = list(list(width = '600px', targets = "2")),
+                        scrollx = TRUE
+      ))
     }
  })
   
-  output$rank <- renderDataTable({
-    
-      covid19_geom %>%
-      dplyr::select(State, `Rank(Confirmed)`, `Number of Confirmed`, 
-             `Number of Recovery`, `Recovery Rate(%)`, `Number of Death`, `Rank(Death Rate)`,
-             `Death Rate(%)`, `Status Unknown`)
-  }, options = list(pageLength = 10, 
-                    autoWidth = FALSE, 
-                    columnDefs = list(list(width = '600px', targets = "2")),
-                    scrollx = TRUE
-                    ))
-  
-
+ 
 }
 
 # Application
