@@ -43,9 +43,11 @@ ui <- fluidPage(
 server <- function(input, output, session){
     # Create the polygon popup
     polygon_popup <- paste0("<strong>Name: </strong>", states$name, "<br>",
-                            "<strong> Confirmed Cases: </strong>", round(covid_df$"Number of Confirmed"),
-                            "<strong> Recovered: </strong>", round(covid_df$"Number of Recovery"),
-                            "<strong> Number of Deaths : </strong>", round(covid_df$"Number of Death"))
+                            "<strong> Confirmed Cases: </strong>", covid_df$"Number of Confirmed",
+                            "<strong> Recovered: </strong>", covid_df$"Number of Recovery",
+                            "<strong> Number of Deaths : </strong>", covid_df$"Number of Death",
+                            "<strong> Rank (Deaths) : </strong>", covid_df$"Rank(Death Rate)",
+                            "<strong> Rank (Confirmed Cases) : </strong>", covid_df$"Rank(Confirmed)")
     
     
     # create foundational map and input the polygon popup
