@@ -319,7 +319,9 @@ server <- function(input, output){
       
     } 
 })
-    
+
+# reference :
+# https://stackoverflow.com/questions/25205410/r-shiny-set-datatable-column-width
       output$spRank <- renderDataTable({
         if (input$var4 == "Rate of Recovery") {
           covid19_geom %>%
@@ -330,7 +332,7 @@ server <- function(input, output){
         } 
         }, options = list(pageLength = 5,
                            autoWidth = FALSE,
-                           columnDefs = list(list(width = '600px', targets = "2")),
+                           columnDefs = list(list(width = '300px', targets = "_all")),
                            scrollx = TRUE))
       output$rank <- renderDataTable({
           covid19_geom %>%
@@ -339,7 +341,7 @@ server <- function(input, output){
                           `Death Rate(%)`, `Status Unknown`)
       }, options = list(pageLength = 10,
                        autoWidth = FALSE,
-                       columnDefs = list(list(width = '600px', targets = "2")),
+                       columnDefs = list(list(width = '300px', targets = "_all")),
                        scrollx = TRUE))
  
 }
