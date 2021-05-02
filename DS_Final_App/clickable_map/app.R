@@ -20,7 +20,7 @@ ui <- fluidPage(
     # place the contents inside a box
     shinydashboard::box(
         width = 12
-        , title = "Click on the map!"
+        , title = "Click on Any State on the Map!"
         # separate the box by a column
         , column(
             width = 2
@@ -39,28 +39,28 @@ ui <- fluidPage(
     plotOutput("data")
 )
 
-# create the server
+
 server <- function(input, output, session){
-    
+    # Create the polygon popup
     polygon_popup <- paste0("<strong>Name: </strong>", states$name, "<br>",
                             "<strong> Confirmed Cases: </strong>", round(covid_df$"Number of Confirmed"),
                             "<strong> Recovered: </strong>", round(covid_df$"Number of Recovery"),
                             "<strong> Number of Deaths : </strong>", round(covid_df$"Number of Death"))
     
     
-    # create foundational map
+    # create foundational map and input the polygon popup
     foundational.map <- shiny::reactive({
         leaflet() %>%
             addProviderTiles(providers$CartoDB.Positron) %>%
             setView(-98.35, 39.7, zoom = 4) %>%
-            addPolygons(data = covid_df
-                         , fillOpacity = 0
-                         , opacity = 0.2
-                         , color = "#000000"
-                         , weight = 2
-                         , layerId = covid_df$name
-                         , group = "click.list"
-                        , popup = polygon_popup
+            addPolygons(data = covid_df,
+                        fillOpacity = 0,
+                        opacity = 0.2,
+                        color = "#000000",
+                        weight = 2,
+                        layerId = covid_df$name,
+                        group = "click.list",
+                        popup = polygon_popup
             )
     })
 
@@ -69,7 +69,7 @@ output$myMap <- renderLeaflet({
         
     })
     
-    # store the list of clicked polygons in a vector
+    # store the list of clicked polygons into a vector
     click.list <- shiny::reactiveValues(ids = vector())
     
     # observe where the user clicks on the leaflet map
@@ -81,12 +81,10 @@ output$myMap <- renderLeaflet({
         # store the polygon ids which are being clicked
         click.list$ids <- c(click.list$ids, click$id)
         
-        # filter the spatial data frame
-        # by only including polygons
-        # which are stored in the click.list$ids object
+        # filter the spatial data frame by only including polygons which are stored in the click.list$ids object
         lines.of.interest <- covid_df[which(covid_df$name %in% click.list$ids ) , ]
         
-        # if statement
+        # create if statement
         if(is.null(click$id)){
             # check for required values, if true, then the issue
             # is "silent". See more at: ?req
@@ -96,8 +94,7 @@ output$myMap <- renderLeaflet({
             
             # call the leaflet proxy
             leaflet::leafletProxy(mapId = "myMap") %>%
-                # and add the polygon lines
-                # using the data stored from the lines.of.interest object
+                # add the polygon lines using the data stored from the lines.of.interest object
                 addPolylines(data = lines.of.interest
                               , layerId = lines.of.interest@data$id
                               , color = "#6cb5bc"
@@ -112,11 +109,8 @@ output$myMap <- renderLeaflet({
         # recreate $myMap
         output$myMap <- leaflet::renderLeaflet({
             
-            # first
             # set the reactive value of click.list$ids to NULL
             click.list$ids <- NULL
-            
-            # second
             # recall the foundational.map() object
             foundational.map()
         })
