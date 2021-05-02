@@ -91,14 +91,9 @@ ui <- fluidPage(
              
     ),
     tabPanel("Ranking",
-      fluidRow(column(4,
-                      checkboxInput("var4", "Rate of Recovery"),
-                      checkboxInput("var5", "Rate of Death")
-                      ),
-               column(4, plotOutput("rPlot")
-                      ),
-               column(4, plotOutput("dPlot")
-                      )
+      fluidRow(column(2, radioButtons(inputId = "var4", label = "Map of Rate",choices = c("Rate of Recovery", "Rate of Death"))),
+               column(5, plotOutput("usPlot")),
+               column(5, dataTableOutput("spRank"))
       ),
       fluidRow(
         column(12, dataTableOutput("rank"))
@@ -301,42 +296,51 @@ server <- function(input, output){
   })
   
   ### forth tab
-  output$rPlot <- renderPlot({
-    if (isTRUE(input$var4)) {
+  output$usPlot <- renderPlot({
+    if (input$var4 == "Rate of Recovery") {
       plot_usmap(data = covid19_geom, values = "Recovery Rate(%)", color = "blue")+
         scale_fill_continuous(low ="white", high = "red",
-                              name = "Recovery Rate(%)", label = scales::comma)+
+                              name = "Recovery Rate(%) 
+                              \n Grey as Unknown Value", label = scales::comma)+
         labs(title = "Covid-19 Recovery Rate",
              subtitle = paste0("Recovery Rate by States in 2020"))+
         theme(panel.background = element_rect(color = "black", fill = "white"))+
         theme(legend.position = "top")
       
-    }
-  })
-  output$dPlot <- renderPlot({ 
-    if (isTRUE(input$var5)) {
-          plot_usmap(data = covid19_geom, values = "Death Rate(%)", color = "blue")+
-          scale_fill_continuous(low ="white", high = "red",
-                                name = "Death Rate(%)", label = scales::comma)+
-          labs(title = "Covid-19 Death Rate",
-               subtitle = paste0("Death Rate by States in 2020"))+
-          theme(panel.background = element_rect(color = "black", fill = "white"))+
-          theme(legend.position = "top")
-    }
-    })
-
-      output$rank <- renderDataTable({
-        
-        covid19_geom %>%
-          dplyr::select(State, `Rank(Confirmed)`, `Number of Confirmed`, 
-                        `Number of Recovery`, `Recovery Rate(%)`, `Number of Death`, `Rank(Death Rate)`,
-                        `Death Rate(%)`, `Status Unknown`)
-      }, options = list(pageLength = 10, 
-                        autoWidth = FALSE, 
-                        columnDefs = list(list(width = '600px', targets = "2")),
-                        scrollx = TRUE))
+    } else if (input$var4 == "Rate of Death") {
+      plot_usmap(data = covid19_geom, values = "Death Rate(%)", color = "blue")+
+        scale_fill_continuous(low ="white", high = "red",
+                              name = "Death Rate(%)
+                              \n Grey as Unknown Value", label = scales::comma)+
+        labs(title = "Covid-19 Death Rate",
+             subtitle = paste0("Death Rate by States in 2020"))+
+        theme(panel.background = element_rect(color = "black", fill = "white"))+
+        theme(legend.position = "top")
+      
+    } 
+})
     
-  
+      output$spRank <- renderDataTable({
+        if (input$var4 == "Rate of Recovery") {
+          covid19_geom %>%
+          dplyr::select(State, `Number of Recovery`, `Recovery Rate(%)`)
+        } else if (input$var4 == "Rate of Death"){
+          covid19_geom %>%
+            dplyr::select(State, `Number of Death`, `Death Rate(%)`)
+        } 
+        }, options = list(pageLength = 5,
+                           autoWidth = FALSE,
+                           columnDefs = list(list(width = '600px', targets = "2")),
+                           scrollx = TRUE))
+      output$rank <- renderDataTable({
+          covid19_geom %>%
+            dplyr::select(State, `Rank(Confirmed)`, `Number of Confirmed`,
+                          `Number of Recovery`, `Recovery Rate(%)`, `Number of Death`, `Rank(Death Rate)`,
+                          `Death Rate(%)`, `Status Unknown`)
+      }, options = list(pageLength = 10,
+                       autoWidth = FALSE,
+                       columnDefs = list(list(width = '600px', targets = "2")),
+                       scrollx = TRUE))
  
 }
 
