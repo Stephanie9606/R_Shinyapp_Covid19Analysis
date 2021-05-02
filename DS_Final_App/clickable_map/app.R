@@ -1,16 +1,19 @@
-# load necessary packages
 library(leaflet)    
 library(shiny)
 library(shinydashboard)
 library(sp)
 library(rgdal)
 library(geojsonio)
+library(tidyverse)
 
+setwd("~/desktop/fp_final-project-group-5/ds_final_app/clickable_map")
 
+covid <- read_rds("covid19_geom.rds")
 
 states <- geojson_read(x = "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json", 
         what = "sp")
 
+covid_df <- merge(states, covid, by.x = "name", by.y = "State")
 
 # create the UI
 ui <- fluidPage(
@@ -32,24 +35,32 @@ ui <- fluidPage(
                                      height = 850
             )
         )
-    ) 
+    ),
+    plotOutput("data")
 )
 
 # create the server
-server <- function( input, output, session ){
+server <- function(input, output, session){
+    
+    polygon_popup <- paste0("<strong>Name: </strong>", states$name, "<br>",
+                            "<strong> Confirmed Cases: </strong>", round(covid_df$"Number of Confirmed"),
+                            "<strong> Recovered: </strong>", round(covid_df$"Number of Recovery"),
+                            "<strong> Number of Deaths : </strong>", round(covid_df$"Number of Death"))
+    
     
     # create foundational map
     foundational.map <- shiny::reactive({
         leaflet() %>%
             addProviderTiles(providers$CartoDB.Positron) %>%
             setView(-98.35, 39.7, zoom = 4) %>%
-            addPolygons(data = states
+            addPolygons(data = covid_df
                          , fillOpacity = 0
                          , opacity = 0.2
                          , color = "#000000"
                          , weight = 2
-                         , layerId = states$name
+                         , layerId = covid_df$name
                          , group = "click.list"
+                        , popup = polygon_popup
             )
     })
 
@@ -62,13 +73,9 @@ output$myMap <- renderLeaflet({
     click.list <- shiny::reactiveValues(ids = vector())
     
     # observe where the user clicks on the leaflet map
-    # during the Shiny app session
-    # Courtesy of two articles:
-    # https://stackoverflow.com/questions/45953741/select-and-deselect-polylines-in-shiny-leaflet
-    # https://rstudio.github.io/leaflet/shiny.html
     shiny::observeEvent(input$myMap_shape_click, {
         
-        # store the click(s) over time
+        # store the click over time
         click <- input$myMap_shape_click
         
         # store the polygon ids which are being clicked
@@ -77,7 +84,7 @@ output$myMap <- renderLeaflet({
         # filter the spatial data frame
         # by only including polygons
         # which are stored in the click.list$ids object
-        lines.of.interest <- states[which(states$name %in% click.list$ids ) , ]
+        lines.of.interest <- covid_df[which(covid_df$name %in% click.list$ids ) , ]
         
         # if statement
         if(is.null(click$id)){
@@ -99,11 +106,8 @@ output$myMap <- renderLeaflet({
         }
     })
     
-    
-    # Create the logic for the "Clear the map" action button
-    # which will clear the map of all user-created highlights
-    # and display a clean version of the leaflet map
-    shiny::observeEvent( input$clearHighlight, {
+    # Create the logic for the "Clear the map" button
+    shiny::observeEvent(input$clearHighlight, {
         
         # recreate $myMap
         output$myMap <- leaflet::renderLeaflet({
@@ -117,7 +121,13 @@ output$myMap <- renderLeaflet({
             foundational.map()
         })
     })
+
 }
+
+
+
+
+
 
 ## run shinyApp
 shiny::shinyApp( ui = ui, server = server)
