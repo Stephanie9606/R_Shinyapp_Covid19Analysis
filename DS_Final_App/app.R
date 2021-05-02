@@ -4,6 +4,7 @@ library(rgdal)
 library(sp)
 library(leaflet)
 library(shinythemes)
+library(geojsonio)
 
 
 
@@ -12,11 +13,14 @@ readr::read_rds("covid19_geom.rds") ->
 
 # Get USA polygon data
 
-USA <- raster::getData("GADM", country = "USA", level = 2)
+states <- geojson_read("gz_2010_us_040_00_500k.json",what = "sp")
 
-covid.df <- merge(USA, covid19_geom, by.x = "NAME_1", by.y = "State")
+covid.df <- merge(states, covid19_geom, by.x = "NAME", by.y = "State")
 
 class(covid.df)
+
+pal2 <- colorNumeric(palette = "Reds", domain=NULL)
+
 
 # UI
 ui <- shinyUI(fluidPage(theme = shinytheme("united"),
@@ -77,7 +81,7 @@ ui <- shinyUI(fluidPage(theme = shinytheme("united"),
                                                         "Wisconsin",
                                                         "Wyoming"
                                             ),
-                                            selected = "Alabama")),
+                                            selected = "Choose a State")),
                                 mainPanel(leafletOutput(outputId = 'map', height = 
                                                             800)
                                 )
@@ -90,10 +94,15 @@ ui <- shinyUI(fluidPage(theme = shinytheme("united"),
 # SERVER
 server <- function(input, output) {
     output$map <- renderLeaflet({
-        addProviderTiles(providers$Esri.NatGeoWorldMap)
         leaflet(covid.df) %>% 
-            setView(lng = -98.583, lat = 39.833, zoom = 4) #%>% 
-        
+            addProviderTiles(providers$Stamen.TonerLite) %>% 
+            setView(lng = -98.583, lat = 39.833, zoom = 4) %>%
+            addPolygons(data = covid.df ,fillColor = ~pal2(selectedState()),
+                        popup = paste0("<strong>State: </strong>", 
+                                       covid.df$NAME),
+                        color = "#BDBDC3",
+                        fillOpacity = 0.8,
+                        weight = 1)
     })
 
     # selected state
@@ -121,9 +130,28 @@ server <- function(input, output) {
                         fillOpacity = 0.8,
                         weight = 1)
     })
-}
-
-
+    # selected year
+    selectedYear <- reactive({
+        covid.df[covid.df$adult_smoking_2015 == input$yearInput &
+                       smoking.df$adult_smoking_2016 == input$yearInput &
+                       smoking.df$adult_smoking_2017 == input$yearInput,] 
+    })
+    
+    observe({
+        state_popup1 <- paste0("<strong>State: </strong>", 
+                               selectedState()$NAME)
+        
+        leafletProxy("map", data = selectedYear()) %>%
+            clearShapes() %>%
+            addPolygons(fillColor = ~pal(selectedYear()$yearInput),
+                        popup = state_popup1,
+                        color = "#BDBDC3",
+                        fillOpacity = 0.8,
+                        weight = 1)
+    })
+    
+    
+})
 
 
 # Run app! 
