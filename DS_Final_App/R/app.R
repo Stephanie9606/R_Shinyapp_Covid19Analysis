@@ -23,11 +23,6 @@ readr::read_rds("../data/covid19_n_death.rds") ->
 readr::read_rds("../data/covid19_geom.rds") -> 
   covid19_geom
 
-# if not necessary in map, we can just delete it(leaflet map may need it)
-# convert latitude and longitude data in csv to a simple features object
-covid19_tidy %>% 
-  st_as_sf(coords = c("Longitude", "Latitude"),
-           crs = 4326, agr = "field") -> cord_covid
 
 # rbuts1 choices
 case_types <- c("Case", "Death", "Hospitalization", "ICU", "Underlying")
