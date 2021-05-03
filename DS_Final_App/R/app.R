@@ -336,13 +336,13 @@ server <- function(input, output){
       gglm <- ggplot(data = plot_lm(), aes(x = !!input$var2, y = reorder(!!input$var3, !!input$var2))) +
         geom_boxplot() +
         scale_x_log10() +
-        labs(x = !!input$var3, y = !!input$var2) +
+        labs(x = input$var3, y = input$var2) +
         theme_bw()
     } else if (is.character(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
       gglm <- ggplot(data = plot_lm(), aes(x = reorder(!!input$var2, !!input$var3), y = !!input$var3)) +
         geom_boxplot() +
         scale_y_log10() +
-        labs(x = !!input$var2, y = !!input$var3) +
+        labs(x = input$var2, y = input$var3) +
         theme_bw()
     } 
     
