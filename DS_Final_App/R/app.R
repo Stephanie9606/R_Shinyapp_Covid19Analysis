@@ -299,23 +299,45 @@ server <- function(input, output){
     
     # modularity
     gglm <- ggplot(data = plot_lm(), aes(x = !!input$var2, y = !!input$var3))
+    gglmj <- ggplot(data = plot_lm(), aes(x = !!input$var2, y = !!input$var3, color = !!input$var2))
+    gglmbx <- ggplot(data = plot_lm(), aes(x = !!input$var2, y = !!input$var3, fill = !!input$var2))
+    gglmby <- ggplot(data = plot_lm(), aes(x = !!input$var2, y = !!input$var3, fill = !!input$var3))
     
     # if-else numeric/factor
     if (is.numeric(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
       gglm <- gglm +
-        geom_point()
+        geom_point() +
+        theme_bw()
     } else if (is.factor(covid19_lmdf[[input$var2]]) && is.factor(covid19_lmdf[[input$var3]])){
-      gglm <- gglm +
-        geom_jitter()
+      gglm <- gglmj +
+        geom_jitter() +
+        theme_bw() +
+        scale_color_brewer(palette = "BuPu")
     } else if (is.factor(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
-      gglm <- gglm +
+      gglm <- gglmbx +
         geom_boxplot() +
-        scale_y_log10()
+        scale_y_log10() +
+        theme_bw() +
+        scale_fill_brewer(palette = "BuPu")
     } else if (is.numeric(covid19_lmdf[[input$var2]]) && is.factor(covid19_lmdf[[input$var3]])){
-      gglm <- gglm +
+      gglm <- gglmby +
         geom_boxplot() +
-        scale_x_log10()
-    }
+        scale_x_log10() +
+        theme_bw() +
+        scale_fill_brewer(palette = "BuPu")
+    } else if (is.numeric(covid19_lmdf[[input$var2]]) && is.character(covid19_lmdf[[input$var3]])){
+      gglm <- ggplot(data = plot_lm(), aes(x = !!input$var2, y = reorder(!!input$var3, !!input$var2))) +
+        geom_boxplot() +
+        scale_x_log10() +
+        labs(x = input$var3, y = input$var2) +
+        theme_bw()
+    } else if (is.character(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
+      gglm <- ggplot(data = plot_lm(), aes(x = reorder(!!input$var2, !!input$var3), y = !!input$var3)) +
+        geom_boxplot() +
+        scale_y_log10() +
+        labs(x = input$var2, y = input$var3) +
+        theme_bw()
+    } 
     
     # output gglm
     gglm  
@@ -346,7 +368,8 @@ server <- function(input, output){
       } else{
         lmout <- lm(covid19_lmdf[[input$var3]] ~ covid19_lmdf[[input$var2]])
         qplot(x = lmout$fitted, y = lmout$residuals,
-              main = "Residuals vs Fitted")
+              main = "Residuals vs Fitted") +
+          theme_bw()
       }
     }
   })
@@ -365,7 +388,8 @@ server <- function(input, output){
               main = "QQ Plot",
               xlab = "theoretical",
               ylab = "sample") +
-          geom_qq_line()
+          geom_qq_line() +
+          theme_bw()
       }
     }
   })
