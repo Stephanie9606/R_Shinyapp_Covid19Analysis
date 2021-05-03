@@ -1,8 +1,6 @@
 # Author: Chiyun, Sihyuan, Trevor
 
-library(readr)
 library(tidyverse)
-library(ggplot2)
 library(leaflet)
 library(sf)
 library(lubridate)
@@ -34,11 +32,6 @@ geojson_read(x = "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/mast
 merge(covid19_states, covid19_geom, by.x = "name", by.y = "State") ->
   covid19_mapdf
 
-# if not necessary in map, we can just delete it(leaflet map may need it)
-# convert latitude and longitude data in csv to a simple features object
-covid19_tidy %>% 
-  st_as_sf(coords = c("Longitude", "Latitude"),
-           crs = 4326, agr = "field") -> cord_covid
 
 # rbuts1 choices
 case_types <- c("Case", "Death", "Hospitalization", "ICU", "Underlying")
