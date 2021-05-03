@@ -1,0 +1,147 @@
+---
+title: "Vignette"
+author: "Chi-Yun Liu, Sih-Yuan Han and Trevor Richardson"
+date: "5/1/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r include=FALSE}
+library(tidyverse)
+```
+
+# COVID-19 (Use Case)
+
+In early 2020, a deadly pandemic spread throughout the world. COVID-19 has claimed millions of lives and public health agencies have struggled to contain the virus and as a result the virus has spread uncontrollably throughout the world. The app we created doesn't necessarily solve the COVID-19 problem but it is designed to help the general public or other experts better visualize the data sets released by the CDC. The CDC has collected millions of rows of data of messy data and our app helps to provide context.
+
+# Packages Used
+
+We created 4 different tabs to visualize our data and each tab required generally the same packages, we will list each tab and describe what each were used for and what version we used:
+
+1. Tidyverse
+```{r}
+packageVersion("tidyverse")
+```
+
+- This is the foundation of our app and includes the essential functions to make certain aspects of app work. Since our dataset from the CDC was about 9 gigabytes, we filtered out data to include the variables that we needed and saved them to an rds file to save time and resources. Additionally, Tidyverse includes ggplot2 which is what we use to plot our data on a visually appealing graphs.
+2. leaflet
+```{r}
+packageVersion("leaflet")
+```
+
+- leaflet allowed us to create a clickable map interface which would allow a user to click on any state and to generate a pop-up to display pertinent information.
+3. sf
+```{r}
+packageVersion("sf")
+```
+
+- sf allowed us to plot the data on the United States map by converting a data set to spatial data. 
+4. lubridate
+```{r}
+packageVersion("lubridate")
+```
+
+- The dataset has a column with dates in a non traditional format, so we needed lubridate to parse the dates and be recognized as such.
+5. raster
+```{r}
+packageVersion("raster")
+```
+
+6. shiny
+```{r}
+packageVersion("shiny")
+```
+
+- Shiny is the true foundation of the app, the package is what allows us to create the app and to divide each component of the app in the form of tabs, ie, the US clickable map in tab #1 and the univariate plot in tab #2 and so on.
+7. bslib
+```{r}
+packageVersion("bslib")
+```
+
+- This package is used to customize our bootstrap theme, when looking at the shiny app, there are some colors associated with the tab and that was created with this package.
+8. shinydashboard
+```{r}
+packageVersion("shinydashboard")
+```
+
+- The clickable map used components of the shinydashboard package to make the map clickable. Without it, we would not have been able to create a clickable map and to generate a popup when clicking the map.
+9. sp
+```{r}
+packageVersion("sp")
+```
+
+- As previously mentioned we used sf to allow us to convert the data to spatial data, but we needed a package that can combine that spatial data and to plot the data correctly onto a map, it does so by plotting data into a defined gridline and those gridlines are created in conjuction with another package rgdal.
+11. rgdal
+```{r}
+packageVersion("rgdal")
+```
+
+- rgdal provides the gridlines and works in conjuction with sp and another package geojsonio
+12. geojsonio
+```{r}
+packageVersion("geojsonio")
+```
+
+- This package allowed us to obtain a US map with accurate measurements in the form of US State lines and to define the gridlines made in rgdal.
+
+# Data Source and Structure
+
+Our chosen dataset is from the Center for Disease Control (CDC) and is available to view in the link below:
+[link] https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4
+The dataset is quite large at 3.6 gigabytes and takes a while to load into rstudio, even on a Mac Pro desktop with a 28 core processor it took around 3-4 minutes to load into. With that said, we had to cut down the data to make creating this app much more streamlined and especially with little to no down time involved (In the form of waiting for rstudio to process and load the dataset.)
+
+
+```{r include=FALSE}
+readr::read_rds("./DS_Final_App/data/covid19_tidy.rds") -> 
+  covid19_tidy
+```
+
+```{r}
+glimpse(covid19_tidy)
+```
+
+- What we did was we converted and saved the dataset in rds form to save time and resources and it made creating the app much easier. The rows of data can be seen using the glimpse data above, which is what the dataset primarily consisted of. We did however, remove some columns such as "fips code" and "exposure_yn", we did not need the fips code to plot our data as we only needed the State in addition to the longitude and latitude. The "exposure_yn" is of no use as we are working with COVID data and exposure served no purpose in our analysis. 
+
+
+# EDA Inputs, Controls, and Outputs
+
+1. First Tab: COVID-19 US Map
+- Users will be presented with the United States map and can click on any state and that click will generate a popup that will show a summary of data that we thought would be easily interpretable to someone not familiar with statistics. It consists of confirmed cases, number of deaths and rank. Rank being how they rank in deaths and confirmed cases versus other US states. For example, California is ranked #1 in confirmed cases because they have the most confirmed cases of COVID-19. Georgia on the other hand is ranked #1 in death cases as they have the most deaths due to COVID-19. The other variables we display in the pop-up is self explanatory. This tab is a quick and easy way for someone to see what the data is for the state they are interested in without have to search for the state's data in a spreadsheet of data. This tab is likely our most user friendly tab in our app.
+
+2. Second Tab: Plot Analysis
+A left panel with 2 tab pages.
+- Inputs and Control: Users may choose which type of the data they want to see between 5 options, including "Case", "Death", "Hospitalization", "ICU" and "Underlying". Then users may choose to correlate the data based on state, race, gender and so on. On the bottom of the panel, users may select the date range to view the data in a choose timeline. For example, they can move the slider to only include data from January to March and view the data just between those two months.
+- Outputs:   
+The first tab is "Cumulative Data", where users can check the line plot of the data. For example, we can learn from the plot that in the end of 2020, California reaches the highest confirmed case through the states with over one million cases.   
+The second tab is "Race Analysis", where users could check that most of the confirmed cases are white, and followed by Black and Asian. 
+
+# Statistical Analysis Inputs, Controls, and Outputs
+
+1. Third Tab: Data Analysis
+- Inputs and Control: 
+Users may select the X and Y input to see the plot of the data they are interested in with point or box plot, which would vary by the input type (Categorical or Numeric). On the top right corner, this shiny app allows users to choose whether they want to check the residual plot and QQ plot. 
+- Outputs: 
+Based on this tab, we can learn the correlation between input X and Y based on linear model summary, residual plot and QQ plot. 
+
+2. Forth Tab: Ranking
+- Inputs, control and output: 
+Users can select which ranking they want to see, for example they can click on "Confirmed Cases" and to the right will be a plot of the US map and will show how each US state ranks in the chosen ranking input. So clicking on "Death Cases" will show a different plot to show how each US state ranks and so on. This tab is probably what most users will focus on as it essentially puts the dataset into layman terms as it is easily controllable and readable. 
+
+
+# Reference
+[1] https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4
+
+[2] https://stackoverflow.com/questions/25205410/r-shiny-set-datatable-column-width
+
+[3] https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations
+
+[4] https://www.gis-blog.com/create-a-leaflet-map-using-r/
+
+[5] http://www.r-graph-gallery.com/264-control-ggplot2-boxplot-colors.html
+
+
+
+
