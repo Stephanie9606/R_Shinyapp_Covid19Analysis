@@ -42,7 +42,7 @@ ui <- fluidPage(
     tabPanel("Covid-19 USmap",
              leafletOutput("map"),
              absolutePanel(top = 10, right = 10,
-                           varSelectInput("type1", "Covid19 Case Type", data = covid19_geom[c(4,6)]))
+                           varSelectInput("type1", "Covid19 Case Type", data = covid19_geom[c(5,7)]))
         
     ),
     tabPanel("Plot Analysis",
@@ -105,29 +105,10 @@ ui <- fluidPage(
 
 # Server
 server <- function(input, output){
-  ### tab 1 Us map
-  # pal <- colorQuantile("Blue", NULL, n =5)
-  # 
-  # colorpal <- reactive({
-  #   if(input$type1 == "Number of confirmed"){
-  #     colorNumeric(geom_covid19$Confirmed_Cases)
-  #   } else {
-  #     colorNumeric(geom_covid19$Death_Cases)
-  #   }
-  #   colorpal
-  # })
+  ### first tab Us map
+
   
-  output$map <- renderLeaflet({
-  leaflet(covid19_geom) %>% 
-      addProviderTiles(providers$CartoDB.Positron) %>% 
-      setView(-98.35, 39.7, zoom = 4) # set US boundary
-      # addPolygons(data = geom_covid19,
-      #             fillColor = ~pal(colorpal),
-      #             fillOpacity = 0.4,
-      #             weight = 2,
-      #             color = "white")
-  })
-  
+
   ### second tab
   ## plot1
   output$plot1 <- renderPlot({
