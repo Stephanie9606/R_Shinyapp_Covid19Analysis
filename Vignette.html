@@ -221,6 +221,65 @@ summary {
 <li>rgdal</li>
 <li>geojsonio</li>
 </ol>
+<div id="packages-versions-used" class="section level2">
+<h2>Packages Versions Used</h2>
+<pre class="r"><code>packageVersion(&quot;tidyverse&quot;)</code></pre>
+<pre><code>## [1] &#39;1.3.0&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;leaflet&quot;)</code></pre>
+<pre><code>## [1] &#39;2.0.4.1&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;sf&quot;)</code></pre>
+<pre><code>## [1] &#39;0.9.8&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;lubridate&quot;)</code></pre>
+<pre><code>## [1] &#39;1.7.9.2&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;raster&quot;)</code></pre>
+<pre><code>## [1] &#39;3.4.5&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;shiny&quot;)</code></pre>
+<pre><code>## [1] &#39;1.6.0&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;bslib&quot;)</code></pre>
+<pre><code>## [1] &#39;0.2.4&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;usmap&quot;)</code></pre>
+<pre><code>## [1] &#39;0.5.2&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;shinydashboard&quot;)</code></pre>
+<pre><code>## [1] &#39;0.7.1&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;sp&quot;)</code></pre>
+<pre><code>## [1] &#39;1.4.5&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;rgdal&quot;)</code></pre>
+<pre><code>## [1] &#39;1.5.23&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;geojsonio&quot;)</code></pre>
+<pre><code>## [1] &#39;0.9.4&#39;</code></pre>
+</div>
+</div>
+<div id="data-source-and-structure" class="section level1">
+<h1>Data Source and Structure</h1>
+<p>Data picked up on CDC</p>
+<p>[link] <a href="https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4" class="uri">https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4</a></p>
+<pre class="r"><code>glimpse(covid19_tidy)</code></pre>
+<pre><code>## Rows: 16,227,111
+## Columns: 16
+## $ `Date(Monthly)`         &lt;date&gt; 2020-04-01, 2020-07-01, 2020-07-01, 2020-05-0…
+## $ `State(Abbrev)`         &lt;chr&gt; &quot;AK&quot;, &quot;AL&quot;, &quot;AL&quot;, &quot;AR&quot;, &quot;AR&quot;, &quot;AR&quot;, &quot;AR&quot;, &quot;AR&quot;…
+## $ Age                     &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ Sex                     &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ Race                    &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ Ethnicity               &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ `Identified Process`    &lt;chr&gt; &quot;Routine surveillance&quot;, NA, NA, NA, NA, NA, NA…
+## $ `Case Status`           &lt;chr&gt; &quot;Laboratory-confirmed case&quot;, &quot;Laboratory-confi…
+## $ `Symptom Status`        &lt;chr&gt; &quot;Symptomatic&quot;, &quot;Symptomatic&quot;, &quot;Symptomatic&quot;, &quot;…
+## $ Hospitalization         &lt;fct&gt; Yes, Yes, Yes, No, Yes, NA, NA, No, Yes, No, Y…
+## $ ICU                     &lt;fct&gt; No, NA, NA, NA, Yes, NA, NA, NA, NA, NA, NA, N…
+## $ Death                   &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, No…
+## $ `Underlying Conditions` &lt;fct&gt; Yes, , , Yes, Yes, , , Yes, , , , , , , , , , …
+## $ Latitude                &lt;dbl&gt; 61.30250, 32.60101, 32.60101, 34.75193, 34.751…
+## $ Longitude               &lt;dbl&gt; -158.77502, -86.68074, -86.68074, -92.13138, -…
+## $ State                   &lt;chr&gt; &quot;Alaska&quot;, &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Arkansas&quot;, &quot;A…</code></pre>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<p>[1] <a href="https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4" class="uri">https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4</a></p>
+<p>[2] <a href="https://stackoverflow.com/questions/25205410/r-shiny-set-datatable-column-width" class="uri">https://stackoverflow.com/questions/25205410/r-shiny-set-datatable-column-width</a></p>
+<p>[3] <a href="https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations" class="uri">https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations</a></p>
+<p>[4] <a href="https://www.gis-blog.com/create-a-leaflet-map-using-r/" class="uri">https://www.gis-blog.com/create-a-leaflet-map-using-r/</a></p>
+<p>[5] <a href="http://www.r-graph-gallery.com/264-control-ggplot2-boxplot-colors.html" class="uri">http://www.r-graph-gallery.com/264-control-ggplot2-boxplot-colors.html</a></p>
 </div>
 
 

@@ -9,6 +9,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r include=FALSE}
+library(tidyverse)
+```
+
 # COVID-19
 
 In early 2020, a deadly pandemic spread throughout the world. COVID-19 has claimed millions of lives and public health agencies have struggled to contain the virus and as a result the virus has spread uncontrollably throughout the world. The app we created doesn't necessarily solve the COVID-19 problem but it is designed to help the general public or other experts better visualize the data sets released by the CDC. The CDC has collected millions of rows of data of messy data and our app helps to provide context.
@@ -31,7 +35,45 @@ We created 4 different tabs to visualize our data and each tab required generall
 11. rgdal
 12. geojsonio
 
+## Packages Versions Used
+```{r}
+packageVersion("tidyverse")
+packageVersion("leaflet")
+packageVersion("sf")
+packageVersion("lubridate")
+packageVersion("raster")
+packageVersion("shiny")
+packageVersion("bslib")
+packageVersion("usmap")
+packageVersion("shinydashboard")
+packageVersion("sp")
+packageVersion("rgdal")
+packageVersion("geojsonio")
+```
+# Data Source and Structure
 
+Data picked up on CDC
+
+[link] https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4
+```{r include=FALSE}
+readr::read_rds("./DS_Final_App/data/covid19_tidy.rds") -> 
+  covid19_tidy
+```
+
+```{r}
+glimpse(covid19_tidy)
+```
+
+# Reference
+[1] https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4
+
+[2] https://stackoverflow.com/questions/25205410/r-shiny-set-datatable-column-width
+
+[3] https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations
+
+[4] https://www.gis-blog.com/create-a-leaflet-map-using-r/
+
+[5] http://www.r-graph-gallery.com/264-control-ggplot2-boxplot-colors.html
 
 
 

@@ -438,8 +438,7 @@ server <- function(input, output){
     } 
 })
 
-# reference :
-# https://stackoverflow.com/questions/25205410/r-shiny-set-datatable-column-width
+
       output$spRank <- renderDataTable({
         if(input$var4 == "Confirmed Cases"){
           covid19_geom %>%
