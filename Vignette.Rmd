@@ -25,3 +25,18 @@ We created 4 different tabs to visualize our data and each tab required generall
 5. raster
 6. shiny
 7. bslib
+8. usmap
+9. shinydashboard
+10. sp
+11. rgdal
+12. geojsonio
+
+
+
+
+
+
+
+
+
+
