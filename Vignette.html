@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Trevor Richardson, Chi Yun and Stephaie" />
+<meta name="author" content="Chi-Yun Liu, Sih-Yuan Han and Trevor Richardson" />
 
 
 <title>Vignette</title>
@@ -189,14 +189,14 @@ summary {
 
 
 <h1 class="title toc-ignore">Vignette</h1>
-<h4 class="author">Trevor Richardson, Chi Yun and Stephaie</h4>
+<h4 class="author">Chi-Yun Liu, Sih-Yuan Han and Trevor Richardson</h4>
 <h4 class="date">5/1/2021</h4>
 
 </div>
 
 
-<div id="covid-19" class="section level1">
-<h1>COVID-19</h1>
+<div id="covid-19-use-case" class="section level1">
+<h1>COVID-19 (Use Case)</h1>
 <p>In early 2020, a deadly pandemic spread throughout the world. COVID-19 has claimed millions of lives and public health agencies have struggled to contain the virus and as a result the virus has spread uncontrollably throughout the world. The app we created doesn’t necessarily solve the COVID-19 problem but it is designed to help the general public or other experts better visualize the data sets released by the CDC. The CDC has collected millions of rows of data of messy data and our app helps to provide context.</p>
 </div>
 <div id="packages-used" class="section level1">
@@ -226,11 +226,11 @@ summary {
 <pre class="r"><code>packageVersion(&quot;tidyverse&quot;)</code></pre>
 <pre><code>## [1] &#39;1.3.0&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;leaflet&quot;)</code></pre>
-<pre><code>## [1] &#39;2.0.4.1&#39;</code></pre>
+<pre><code>## [1] &#39;2.0.3&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;sf&quot;)</code></pre>
-<pre><code>## [1] &#39;0.9.8&#39;</code></pre>
+<pre><code>## [1] &#39;0.9.7&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;lubridate&quot;)</code></pre>
-<pre><code>## [1] &#39;1.7.9.2&#39;</code></pre>
+<pre><code>## [1] &#39;1.7.10&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;raster&quot;)</code></pre>
 <pre><code>## [1] &#39;3.4.5&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;shiny&quot;)</code></pre>
@@ -242,7 +242,7 @@ summary {
 <pre class="r"><code>packageVersion(&quot;shinydashboard&quot;)</code></pre>
 <pre><code>## [1] &#39;0.7.1&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;sp&quot;)</code></pre>
-<pre><code>## [1] &#39;1.4.5&#39;</code></pre>
+<pre><code>## [1] &#39;1.4.4&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;rgdal&quot;)</code></pre>
 <pre><code>## [1] &#39;1.5.23&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;geojsonio&quot;)</code></pre>
@@ -253,6 +253,9 @@ summary {
 <h1>Data Source and Structure</h1>
 <p>Data picked up on CDC</p>
 <p>[link] <a href="https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4" class="uri">https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4</a></p>
+<ul>
+<li>At first, we removed unnecessary columns such as “fips code” and “exposure_yn”. Then, we filtered out the data which is not in 2020. After we use “tidyverse” to clean up our data, we merged back fips code that we need, which is 51 states.</li>
+</ul>
 <pre class="r"><code>glimpse(covid19_tidy)</code></pre>
 <pre><code>## Rows: 16,227,111
 ## Columns: 16
@@ -272,6 +275,41 @@ summary {
 ## $ Latitude                &lt;dbl&gt; 61.30250, 32.60101, 32.60101, 34.75193, 34.751…
 ## $ Longitude               &lt;dbl&gt; -158.77502, -86.68074, -86.68074, -92.13138, -…
 ## $ State                   &lt;chr&gt; &quot;Alaska&quot;, &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Arkansas&quot;, &quot;A…</code></pre>
+</div>
+<div id="eda-inputs-controls-and-outputs" class="section level1">
+<h1>EDA Inputs, Controls, and Outputs</h1>
+<ol style="list-style-type: decimal">
+<li>First Tab: Covid-19 USmap</li>
+</ol>
+<ul>
+<li>Users may click on the state they are interested in, and the interactive map will automatically shows the specific number of confirmed, recovered, deaths cases and its rank by that state. Users may also click on “clear the map” button to regenerate the map.</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Second Tab: Plot Analysis A left panel with 2 tab pages.</li>
+</ol>
+<ul>
+<li>Inputs and Control: Users may choose which type of the data they want to see between 5 options, including “Case”, “Death”, “Hospitalization”, “ICU” and “Underlying”. Then users may choose to check the data based on state, race, gender and so on. On the bottom of the panel, users may select the date range to check more detailed data.</li>
+<li>Outputs:<br />
+The first tab is “Cumulative Data”, where users can check the line plot of the data. For example, we can learn from the plot that in the end of 2020, California reaches the highest confirmed case through the states with over one million cases.<br />
+The second tab is “Race Analysis”, where users could check that most of the confirmed cases are white, and followed by Black and Asian.</li>
+</ul>
+</div>
+<div id="statistical-analysis-inputs-controls-and-outputs" class="section level1">
+<h1>Statistical Analysis Inputs, Controls, and Outputs</h1>
+<ol style="list-style-type: decimal">
+<li>Third Tab: Data Analysis</li>
+</ol>
+<ul>
+<li>Inputs and Control: Users may select the X and Y input to see the plot of the data they are interested in with point or box plot, which would vary by the input type (Categorical or Numeric). On the top right corner, this shiny app allows users to choose whether they want to check the residual plot and QQ plot.</li>
+<li>Outputs: Based on this tab, we can learn the correlation between input X and Y based on linear model summary, residual plot and QQ plot.</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Forth Tab: Ranking</li>
+</ol>
+<ul>
+<li>Inputs and Control:</li>
+<li>Outputs:</li>
+</ul>
 </div>
 <div id="reference" class="section level1">
 <h1>Reference</h1>
