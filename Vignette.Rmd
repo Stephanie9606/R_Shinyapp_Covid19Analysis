@@ -1,0 +1,26 @@
+---
+title: "Vignette"
+author: "Trevor Richardson, Chi Yun and Stephaie"
+date: "5/1/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# COVID-19
+
+In early 2020, a deadly pandemic spread throughout the world. COVID-19 has claimed millions of lives and public health agencies have struggled to contain the virus and as a result the virus has spread uncontrollably throughout the world. The app we created doesn't necessarily solve the COVID-19 problem but it is designed to help the general public or other experts better visualize the data sets released by the CDC. The CDC has collected millions of rows of data of messy data and our app helps to provide context.
+
+# Packages Used
+
+We created 4 different tabs to visualize our data and each tab required generally the same packages, we will list each tab and describe what each were used for and what version we used:
+
+1. Tidyverse
+2. leaflet
+3. sf
+4. lubridate
+5. raster
+6. shiny
+7. bslib
