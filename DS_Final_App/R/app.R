@@ -111,7 +111,7 @@ ui <- fluidPage(
              
     ),
     tabPanel("Ranking",
-      fluidRow(column(2, radioButtons(inputId = "var4", label = "Map of Rate",choices = c("Rate of Recovery", "Rate of Death"))),
+      fluidRow(column(2, radioButtons(inputId = "var4", label = "Density Maps",choices = c("Confirmed Cases", "Death Cases","Rate of Recovery", "Rate of Death"))),
                column(5, plotOutput("usPlot")),
                column(5, dataTableOutput("spRank"))
       ),
@@ -372,8 +372,27 @@ server <- function(input, output){
   
   ### forth tab
   output$usPlot <- renderPlot({
-    if (input$var4 == "Rate of Recovery") {
-      plot_usmap(data = covid19_geom, values = "Recovery Rate(%)", color = "blue")+
+    if (input$var4 == "Confirmed Cases") {
+      plot_usmap(data = covid19_geom, values = "Number of Confirmed", color = "blue", labels = TRUE)+
+        scale_fill_continuous(low ="white", high = "red",
+                              name = " Number of Confirmed", label = scales::comma)+
+        labs(title = "Covid-19 Confirmed Cases",
+             subtitle = paste0("Confirmed Cases by States in 2020"))+
+        theme(panel.background = element_rect(color = "black", fill = "white"))+
+        theme(legend.position = "top")
+      
+    } else if (input$var4 == "Death Cases") {
+      plot_usmap(data = covid19_geom, values = "Number of Death", color = "blue", labels = TRUE)+
+        scale_fill_continuous(low ="white", high = "red",
+                              name = " Number of Death
+                               \n Grey as Unknown Value", label = scales::comma)+
+        labs(title = "Covid-19 Death Cases",
+             subtitle = paste0("Death Cases by States in 2020"))+
+        theme(panel.background = element_rect(color = "black", fill = "white"))+
+        theme(legend.position = "top")
+      
+    }else if (input$var4 == "Rate of Recovery") {
+      plot_usmap(data = covid19_geom, values = "Recovery Rate(%)", color = "blue", labels = TRUE)+
         scale_fill_continuous(low ="white", high = "red",
                               name = "Recovery Rate(%) 
                               \n Grey as Unknown Value", label = scales::comma)+
@@ -383,7 +402,7 @@ server <- function(input, output){
         theme(legend.position = "top")
       
     } else if (input$var4 == "Rate of Death") {
-      plot_usmap(data = covid19_geom, values = "Death Rate(%)", color = "blue")+
+      plot_usmap(data = covid19_geom, values = "Death Rate(%)", color = "blue", labels = TRUE)+
         scale_fill_continuous(low ="white", high = "red",
                               name = "Death Rate(%)
                               \n Grey as Unknown Value", label = scales::comma)+
@@ -398,12 +417,18 @@ server <- function(input, output){
 # reference :
 # https://stackoverflow.com/questions/25205410/r-shiny-set-datatable-column-width
       output$spRank <- renderDataTable({
-        if (input$var4 == "Rate of Recovery") {
+        if(input$var4 == "Confirmed Cases"){
           covid19_geom %>%
-          dplyr::select(State, `Number of Recovery`, `Recovery Rate(%)`)
+            dplyr::select(State, `Number of Confirmed`)
+        } else if (input$var4 == "Death Cases"){
+          covid19_geom %>%
+            dplyr::select(State, `Number of Death`)
+        } else if (input$var4 == "Rate of Recovery") {
+          covid19_geom %>%
+          dplyr::select(State, `Recovery Rate(%)`)
         } else if (input$var4 == "Rate of Death"){
           covid19_geom %>%
-            dplyr::select(State, `Number of Death`, `Death Rate(%)`)
+            dplyr::select(State, `Death Rate(%)`)
         } 
         }, options = list(pageLength = 5,
                            autoWidth = FALSE,
