@@ -52,11 +52,11 @@ packageVersion("geojsonio")
 ```
 # Data Source and Structure
 
-Data picked up on CDC
+Data source from CDC:
 
 [link] https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4
 
-- At first, we removed unnecessary columns such as "fips code" and "exposure_yn". Then, we filtered out the data which is not in 2020. After we use "tidyverse" to clean up our data, we merged back fips code that we need, which is 51 states. 
+- At first, we removed unnecessary columns such as `fips code` and `exposure_yn`. Then, we filtered out the data which is not in 2020. After we use `tidyverse` to clean up our data, we merged back fips code that we need, which is 51 states. 
 
 ```{r include=FALSE}
 readr::read_rds("./DS_Final_App/data/covid19_tidy.rds") -> 
@@ -73,10 +73,10 @@ glimpse(covid19_tidy)
 - Users may click on the state they are interested in, and the interactive map will automatically shows the specific number of confirmed, recovered, deaths cases and its rank by that state. Users may also click on "clear the map" button to regenerate the map.
 2. Second Tab: Plot Analysis
 A left panel with 2 tab pages.
-- Inputs and Control: Users may choose which type of the data they want to see between 5 options, including "Case", "Death", "Hospitalization", "ICU" and "Underlying". Then users may choose to check the data based on state, race, gender and so on. On the bottom of the panel, users may select the date range to check more detailed data. 
+- Inputs and Control: Users may choose which type of the data they want to see between 5 options, including `Case`, `Death`, `Hospitalization`, `ICU` and `Underlying`. Then users may choose to check the data based on state, race, gender and so on. On the bottom of the panel, users may select the date range to check more detailed data. 
 - Outputs:   
-The first tab is "Cumulative Data", where users can check the line plot of the data. For example, we can learn from the plot that in the end of 2020, California reaches the highest confirmed case through the states with over one million cases.   
-The second tab is "Race Analysis", where users could check that most of the confirmed cases are white, and followed by Black and Asian. 
+The first tab is `Cumulative Data`, where users can check the line plot of the data. For example, we can learn from the plot that in the end of 2020, California reaches the highest confirmed case through the states with over one million cases.   
+The second tab is `Race Analysis`, where users could check that most of the confirmed cases are white, and followed by Black and Asian. 
 
 # Statistical Analysis Inputs, Controls, and Outputs
 
@@ -85,8 +85,8 @@ The second tab is "Race Analysis", where users could check that most of the conf
 - Outputs: Based on this tab, we can learn the correlation between input X and Y based on linear model summary, residual plot and QQ plot. 
 
 2. Forth Tab: Ranking
-- Inputs and Control: 
-- Outputs: 
+- Inputs and Control: Users can choose which data they are interested in. They can click radio button for getting the Us density maps and spreadsheets, which reflecting `The Number of Confirmed Cases`, `The Number of Death Cases`, `Recovery Rate`, and `Death Rate`.
+- Outputs: In this tab, users can see the subset data with its density maps. At the same time, users can read the entire spreadsheet that contained the important information of Covid-19 by geography. In the spreadsheet, users can see the rank of confirmed cases and death cases by State as well.
 
 # Reference
 [1] https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4

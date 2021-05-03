@@ -226,11 +226,11 @@ summary {
 <pre class="r"><code>packageVersion(&quot;tidyverse&quot;)</code></pre>
 <pre><code>## [1] &#39;1.3.0&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;leaflet&quot;)</code></pre>
-<pre><code>## [1] &#39;2.0.3&#39;</code></pre>
+<pre><code>## [1] &#39;2.0.4.1&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;sf&quot;)</code></pre>
-<pre><code>## [1] &#39;0.9.7&#39;</code></pre>
+<pre><code>## [1] &#39;0.9.8&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;lubridate&quot;)</code></pre>
-<pre><code>## [1] &#39;1.7.10&#39;</code></pre>
+<pre><code>## [1] &#39;1.7.9.2&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;raster&quot;)</code></pre>
 <pre><code>## [1] &#39;3.4.5&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;shiny&quot;)</code></pre>
@@ -242,7 +242,7 @@ summary {
 <pre class="r"><code>packageVersion(&quot;shinydashboard&quot;)</code></pre>
 <pre><code>## [1] &#39;0.7.1&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;sp&quot;)</code></pre>
-<pre><code>## [1] &#39;1.4.4&#39;</code></pre>
+<pre><code>## [1] &#39;1.4.5&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;rgdal&quot;)</code></pre>
 <pre><code>## [1] &#39;1.5.23&#39;</code></pre>
 <pre class="r"><code>packageVersion(&quot;geojsonio&quot;)</code></pre>
@@ -251,10 +251,10 @@ summary {
 </div>
 <div id="data-source-and-structure" class="section level1">
 <h1>Data Source and Structure</h1>
-<p>Data picked up on CDC</p>
+<p>Data source from CDC:</p>
 <p>[link] <a href="https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4" class="uri">https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4</a></p>
 <ul>
-<li>At first, we removed unnecessary columns such as “fips code” and “exposure_yn”. Then, we filtered out the data which is not in 2020. After we use “tidyverse” to clean up our data, we merged back fips code that we need, which is 51 states.</li>
+<li>At first, we removed unnecessary columns such as <code>fips code</code> and <code>exposure_yn</code>. Then, we filtered out the data which is not in 2020. After we use <code>tidyverse</code> to clean up our data, we merged back fips code that we need, which is 51 states.</li>
 </ul>
 <pre class="r"><code>glimpse(covid19_tidy)</code></pre>
 <pre><code>## Rows: 16,227,111
@@ -288,10 +288,10 @@ summary {
 <li>Second Tab: Plot Analysis A left panel with 2 tab pages.</li>
 </ol>
 <ul>
-<li>Inputs and Control: Users may choose which type of the data they want to see between 5 options, including “Case”, “Death”, “Hospitalization”, “ICU” and “Underlying”. Then users may choose to check the data based on state, race, gender and so on. On the bottom of the panel, users may select the date range to check more detailed data.</li>
+<li>Inputs and Control: Users may choose which type of the data they want to see between 5 options, including <code>Case</code>, <code>Death</code>, <code>Hospitalization</code>, <code>ICU</code> and <code>Underlying</code>. Then users may choose to check the data based on state, race, gender and so on. On the bottom of the panel, users may select the date range to check more detailed data.</li>
 <li>Outputs:<br />
-The first tab is “Cumulative Data”, where users can check the line plot of the data. For example, we can learn from the plot that in the end of 2020, California reaches the highest confirmed case through the states with over one million cases.<br />
-The second tab is “Race Analysis”, where users could check that most of the confirmed cases are white, and followed by Black and Asian.</li>
+The first tab is <code>Cumulative Data</code>, where users can check the line plot of the data. For example, we can learn from the plot that in the end of 2020, California reaches the highest confirmed case through the states with over one million cases.<br />
+The second tab is <code>Race Analysis</code>, where users could check that most of the confirmed cases are white, and followed by Black and Asian.</li>
 </ul>
 </div>
 <div id="statistical-analysis-inputs-controls-and-outputs" class="section level1">
@@ -307,8 +307,8 @@ The second tab is “Race Analysis”, where users could check that most of the 
 <li>Forth Tab: Ranking</li>
 </ol>
 <ul>
-<li>Inputs and Control:</li>
-<li>Outputs:</li>
+<li>Inputs and Control: Users can choose which data they are interested in. They can click radio button for getting the Us density maps and spreadsheets, which reflecting <code>The Number of Confirmed Cases</code>, <code>The Number of Death Cases</code>, <code>Recovery Rate</code>, and <code>Death Rate</code>.</li>
+<li>Outputs: In this tab, users can see the subset data with its density maps. At the same time, users can read the entire spreadsheet that contained the important information of Covid-19 by geography. In the spreadsheet, users can see the rank of confirmed cases and death cases by State as well.</li>
 </ul>
 </div>
 <div id="reference" class="section level1">
