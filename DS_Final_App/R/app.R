@@ -10,6 +10,10 @@ library(raster)
 library(shiny)
 library(bslib)
 library(usmap)
+library(shinydashboard)
+library(sp)
+library(rgdal)
+library(geojsonio)
 
 readr::read_rds("../data/covid19_tidy.rds") -> 
   covid19_tidy
@@ -22,6 +26,13 @@ readr::read_rds("../data/covid19_n_death.rds") ->
 
 readr::read_rds("../data/covid19_geom.rds") -> 
   covid19_geom
+
+geojson_read(x = "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json", 
+                       what = "sp") ->
+   covid19_states
+
+merge(covid19_states, covid19_geom, by.x = "name", by.y = "State") ->
+  covid19_mapdf
 
 # if not necessary in map, we can just delete it(leaflet map may need it)
 # convert latitude and longitude data in csv to a simple features object
@@ -40,16 +51,32 @@ ui <- fluidPage(
   # main pages
   tabsetPanel(type = "pills",
     tabPanel("Covid-19 USmap",
-             leafletOutput("map"),
-             absolutePanel(top = 10, right = 10,
-                           varSelectInput("type1", "Covid19 Case Type", data = covid19_geom[c(4,6)]))
-        
+             # place the contents inside a box
+             shinydashboard::box(
+               width = 12
+               , title = "Click on Any State on the Map!"
+               # separate the box by a column
+               , column(
+                 width = 2
+                 , shiny::actionButton(inputId = "clearHighlight",
+                                       icon = icon( name = "eraser"),
+                                       label = "Clear the Map",
+                                       style = "color: #fff; background-color: #D75453; border-color: #C73232")
+               )
+               , column(
+                 width = 10
+                 , leaflet::leafletOutput(outputId = "myMap",
+                                          height = 850
+                 )
+               )
+             ),
+             plotOutput("data")
     ),
     tabPanel("Plot Analysis",
       sidebarLayout(
         sidebarPanel(
           radioButtons("rbuts1", "What type of the data are you interested in?", choices = case_types, selected = "Case"),
-          varSelectInput("var1", "Check the data based on?", data = covid19_tidy, selected = "`State(Abbrev)`"),
+          varSelectInput("var1", "Check the data based on?", data = covid19_tidy, selected = "State(Abbrev)"),
           sliderInput("slider1", "Select date range",
                       min = as.Date("2020-01-01","%Y-%m-%d"),
                       max = as.Date("2020-12-01","%Y-%m-%d"),
@@ -69,10 +96,10 @@ ui <- fluidPage(
     ),
     tabPanel("Data Analysis",
       fluidRow(column(4,
-                      varSelectInput("var2", "X variable?", data = covid19_lmdf)
+                      varSelectInput("var2", "X variable?", data = covid19_lmdf, selected = "Symptom Status")
                       ),
                column(4,
-                      varSelectInput("var3", "Y variable?", data = covid19_lmdf)
+                      varSelectInput("var3", "Y variable?", data = covid19_lmdf, selected = "Case")
                       ),
                column(4,
                       checkboxInput("cbox1", "Check residual plot?"),
@@ -110,28 +137,84 @@ ui <- fluidPage(
 
 # Server
 server <- function(input, output){
-  ### tab 1 Us map
-  # pal <- colorQuantile("Blue", NULL, n =5)
-  # 
-  # colorpal <- reactive({
-  #   if(input$type1 == "Number of confirmed"){
-  #     colorNumeric(geom_covid19$Confirmed_Cases)
-  #   } else {
-  #     colorNumeric(geom_covid19$Death_Cases)
-  #   }
-  #   colorpal
-  # })
+  ### first tab
+  # Create the polygon popup
+  polygon_popup <- paste0("<strong>State: </strong>", covid19_states$name, "<br>",
+                          "<strong> Confirmed Cases: </strong>", covid19_mapdf$"Number of Confirmed",
+                          "<strong> Recovered: </strong>", covid19_mapdf$"Number of Recovery",
+                          "<strong> Number of Deaths : </strong>", covid19_mapdf$"Number of Death",
+                          "<strong> Rank (Deaths) : </strong>", covid19_mapdf$"Rank(Death Rate)",
+                          "<strong> Rank (Confirmed Cases) : </strong>", covid19_mapdf$"Rank(Confirmed)")
   
-  output$map <- renderLeaflet({
-  leaflet(covid19_geom) %>% 
-      addProviderTiles(providers$CartoDB.Positron) %>% 
-      setView(-98.35, 39.7, zoom = 4) # set US boundary
-      # addPolygons(data = geom_covid19,
-      #             fillColor = ~pal(colorpal),
-      #             fillOpacity = 0.4,
-      #             weight = 2,
-      #             color = "white")
+  
+  # create foundational map and input the polygon popup
+  foundational.map <- shiny::reactive({
+    leaflet() %>%
+      addProviderTiles(providers$CartoDB.Positron) %>%
+      setView(-98.35, 39.7, zoom = 4) %>%
+      addPolygons(data = covid19_mapdf,
+                  fillOpacity = 0,
+                  opacity = 0.2,
+                  color = "#000000",
+                  weight = 2,
+                  layerId = covid19_mapdf$name,
+                  group = "click.list",
+                  popup = polygon_popup
+      )
   })
+  
+  output$myMap <- renderLeaflet({
+    foundational.map()
+    
+  })
+  
+  # store the list of clicked polygons into a vector
+  click.list <- shiny::reactiveValues(ids = vector())
+  
+  # observe where the user clicks on the leaflet map
+  shiny::observeEvent(input$myMap_shape_click, {
+    
+    # store the click over time
+    click <- input$myMap_shape_click
+    
+    # store the polygon ids which are being clicked
+    click.list$ids <- c(click.list$ids, click$id)
+    
+    # filter the spatial data frame by only including polygons which are stored in the click.list$ids object
+    lines.of.interest <- covid19_mapdf[which(covid19_mapdf$name %in% click.list$ids ) , ]
+    
+    # create if statement
+    if(is.null(click$id)){
+      # check for required values, if true, then the issue
+      # is "silent". See more at: ?req
+      req(click$id)
+      
+    } else if(!click$id %in% lines.of.interest@data$id){
+      
+      # call the leaflet proxy
+      leaflet::leafletProxy(mapId = "myMap") %>%
+        # add the polygon lines using the data stored from the lines.of.interest object
+        addPolylines(data = lines.of.interest
+                     , layerId = lines.of.interest@data$id
+                     , color = "#6cb5bc"
+                     , weight = 5
+                     , opacity = 1)
+    }
+  })
+  
+  # Create the logic for the "Clear the map" button
+  shiny::observeEvent(input$clearHighlight, {
+    
+    # recreate $myMap
+    output$myMap <- leaflet::renderLeaflet({
+      
+      # set the reactive value of click.list$ids to NULL
+      click.list$ids <- NULL
+      # recall the foundational.map() object
+      foundational.map()
+    })
+  })
+  
   
   ### second tab
   ## plot1
@@ -171,7 +254,6 @@ server <- function(input, output){
     # modularity
     p1 <- ggplot(total_case(), aes(x = `Date(Monthly)`, y = n, color = !!input$var1)) +
       geom_smooth(se = F) +
-      geom_text(aes(label = !!input$var1, color = !!input$var1)) +
       theme_bw()
     
     # output plot1
@@ -203,6 +285,7 @@ server <- function(input, output){
       d2 %>% 
         group_by(Race, !!input$var1) %>% 
         summarise(total_case = n(), .groups = "keep") %>% 
+        drop_na(Race) %>% 
         drop_na(!!input$var1)
     })
     
@@ -231,7 +314,7 @@ server <- function(input, output){
     gglm <- ggplot(data = plot_lm(), aes(x = !!input$var2, y = !!input$var3))
     
     # if-else numeric/factor
-    if(is.numeric(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
+    if (is.numeric(covid19_lmdf[[input$var2]]) && is.numeric(covid19_lmdf[[input$var3]])){
       gglm <- gglm +
         geom_point()
     } else if (is.factor(covid19_lmdf[[input$var2]]) && is.factor(covid19_lmdf[[input$var3]])){
@@ -259,7 +342,7 @@ server <- function(input, output){
       print(summary(lmout), digits = 2)
     }
     
-    validate(
+    shiny::validate(
       need(is.numeric(covid19_lmdf[[input$var3]]), "Please select Y as Numeric Variable to Check out Linear Model Summary!")
     )
   })
@@ -270,7 +353,7 @@ server <- function(input, output){
     if(isTRUE(input$cbox1)){
       # if y input is factor print plot
       if(is.factor(covid19_lmdf[[input$var3]])) {
-        validate(
+        shiny::validate(
           need(is.numeric(covid19_lmdf[[input$var3]]), "Please select Y as Numeric Variable to Check out Risidual Plot!")
         )
       } else{
@@ -286,7 +369,7 @@ server <- function(input, output){
     if(isTRUE(input$cbox2)){
       # if y input is factor print plot
       if(is.factor(covid19_lmdf[[input$var3]])) {
-        validate(
+        shiny::validate(
           need(is.numeric(covid19_lmdf[[input$var3]]), "Please select Y as Numeric Variable to Check out QQ Plot!")
         )
       } else{

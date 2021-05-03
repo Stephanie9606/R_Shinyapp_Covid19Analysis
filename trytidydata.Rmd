@@ -106,5 +106,27 @@ covid19_lmdf %>%
   drop_na(age_group, race) %>% 
   ggplot(aes(x = age_group, y = race)) +
   geom_jitter()
+
+covid19_lmdf %>% 
+  drop_na(`State(Abbrev)`) %>% 
+  drop_na(Case) %>% 
+  ggplot(aes(x = `State(Abbrev)`, y = Case)) +
+  geom_boxplot() +
+  scale_y_log10()
+
+covid19_lmdf %>% 
+  group_by(`State(Abbrev)`) %>% 
+  summarise(total = sum(Case)) %>% 
+  arrange(desc(total)) %>% 
+  slice(1:20) %>% 
+  inner_join(covid19_lmdf) %>% 
+  ggplot(aes(x = Case, y = `State(Abbrev)`, color = `State(Abbrev)`)) +
+  geom_boxplot() +
+  scale_x_log10() +
+  theme_bw() +
+  coord_flip()
+
+covid19_lmdf %>% str()
+  select(-(2:7))
 ```
 
