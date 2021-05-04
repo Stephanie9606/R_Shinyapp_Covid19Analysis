@@ -8,7 +8,7 @@ Purpose is to present a visual appealing and easily manipulative data involved t
 ## Data Source 
 Data set can obtained from the following [link]: https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4
 
-## The app consists of 4 tabs:
+## The App Consists of 4 Tabs
 1. A US map with a clickable interface allowing you to click on a certain state of interest and display pertinent information
 2. A plot analysis which allows you to select certain x variables and display select statistics
 3. A plot analysis tab that allows for a user to select x and y variables and conduct certain statistical analysis
