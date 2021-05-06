@@ -1,6 +1,4 @@
-# fp_final-project-group-5
-
-Covid-19 Data Analysis Shiny App
+# Covid-19 Data Analysis Shiny App
 
 ## Purpose 
 Purpose is to present a visual appealing and easily manipulative data involved the dataset from the CDC
